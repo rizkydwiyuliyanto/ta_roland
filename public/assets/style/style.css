@@ -1,0 +1,150 @@
+:root {
+  --sidebarBG: #18202B;
+  --headerBG: #E47A2E;
+  --left: 270px;
+  --top: 90px;
+}
+
+.btn-submit {
+  font-size: 17px;
+  padding: 0.5em 2em;
+  border: transparent;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  background: dodgerblue;
+  color: white;
+  width: 100%;
+  border-radius: 4px;
+}
+.btn-submit:hover {
+  background: rgb(2, 0, 36);
+  background: linear-gradient(90deg, rgb(30, 144, 255) 0%, rgb(0, 212, 255) 100%);
+}
+.btn-submit:active {
+  transform: translate(0em, 0.2em);
+}
+
+.form-login {
+  background-color: #F4F4F4;
+  width: 380px;
+  height: 460px;
+  border-radius: 6px;
+  padding: 1.4em 2em;
+  box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.form-login .header {
+  position: absolute;
+  top: -25px;
+  text-align: center;
+  left: 50%;
+  transform: translate(-50%, 0);
+  height: 120px;
+  color: var(--headerBG);
+}
+.form-login .form {
+  margin-top: 80px;
+}
+
+.my-container {
+  width: 900px;
+  margin: 0 auto;
+}
+
+.content-parent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.content-parent .sidebar {
+  background-color: var(--sidebarBG);
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  color: #F4F4F4;
+  width: var(--left);
+}
+.content-parent .sidebar .top {
+  height: var(--top);
+  border-bottom: 1.5px solid #797979;
+  display: flex;
+  align-items: center;
+}
+.content-parent .sidebar .top .title {
+  font-size: 12.8px;
+}
+.content-parent .sidebar .content {
+  width: 100%;
+  height: 75%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+.content-parent .sidebar .content ul {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+}
+.content-parent .sidebar .content ul .active {
+  background-color: rgba(70, 70, 70, 0.7294117647);
+}
+.content-parent .sidebar .content ul li {
+  list-style-type: none;
+  padding: 10px 20px;
+}
+.content-parent .sidebar .content ul li:last-child {
+  margin-bottom: 0;
+}
+.content-parent .sidebar .content ul li a {
+  text-decoration: none;
+  color: #F4F4F4;
+}
+.content-parent .sidebar .bottom {
+  bottom: 2px solid green;
+  display: flex;
+  align-items: center;
+}
+.content-parent .content {
+  width: calc(100% - var(--left));
+  margin-left: auto;
+}
+.content-parent .content header {
+  background-color: var(--headerBG);
+  height: var(--top);
+  display: flex;
+  align-items: center;
+  margin-bottom: 22px;
+  position: relative;
+  color: #F4F4F4;
+}
+.content-parent .content header .account {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  height: 60px;
+  padding-left: 16.5px;
+  border-left: 1.5px solid #3d3d3d;
+}
+.content-parent .content header .account span {
+  font-size: 14.5px;
+  margin-right: 7px;
+  color: #F4F4F4;
+}
+.content-parent .content header .title {
+  position: absolute;
+  width: 400px;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.content-parent .content .data {
+  width: 100%;
+  padding: 12px 14px;
+  background-color: #F4F4F4;
+  border-radius: 6px;
+  box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+}/*# sourceMappingURL=style.css.map */
