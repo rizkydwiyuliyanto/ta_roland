@@ -175,30 +175,23 @@ class AdminKab extends BaseController
     }
     public function data_jadwal_vaksin()
     {
-        $status = $this->request->getVar("status");
         $vaksinModel = new VaksinModel;
         $dataJadwalVaksin = "";
         $id_kab = session()->get("user")["id"];
-        if ($status == "0" or $status == "") {
-            $dataJadwalVaksin = $vaksinModel->join(
-                "pemilik_ternak",
-                "pemilik_ternak.id_pemilik_ternak = vaksinasi.id_peternak",
-                "left"
-            )->where(
+        $dataJadwalVaksin = $vaksinModel->join(
+            "pemilik_ternak",
+            "pemilik_ternak.id_pemilik_ternak = vaksinasi.id_peternak",
+            "left"
+        )->join(
+            ""
+        )
+            ->where(
                 "pemilik_ternak.id_kab",
                 $id_kab
             )->findAll();
-        }
-        // $dataJadwalVaksin = $dataJadwalVaksinModel->select(
-        //     "
-        //         jadwal_vaksin.id_jadwal,
-        //         jadwal_vaksin.tgl_pemberian,
-        //         vaksinasi.jumlah_dosis,
-        //         vaksinasi.id_vaksinasi
-        //     "
-        // );
+
         $data = array(
-            "page" => "Admin/kabupaten/data_jadwal_vaksin.php",
+            "page" => "Admin/kabupaten/data_dokumentasi.php",
             "data_jadwal_vaksin" => $dataJadwalVaksin
         );
         return view("container", $data);
@@ -304,6 +297,7 @@ class AdminKab extends BaseController
     }
     public function data_dokumentasi()
     {
+
         $data = array(
             "page" => "Admin/kabupaten/data_dokumentasi.php"
         );

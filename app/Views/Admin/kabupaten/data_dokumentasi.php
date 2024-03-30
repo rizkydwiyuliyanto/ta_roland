@@ -4,9 +4,14 @@
         <?php include("header.php") ?>
         <div class="mt-4">
             <div class="my-container">
-                <h2>
-                   Dokumentasi
-                </h2>
+                <div class="d-flex mb-4 justify-content-between align-items-center">
+                    <h2>
+                        Data dokumentasi
+                    </h2>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                        Tambah
+                    </button>
+                </div>
             </div>
 
         </div>

@@ -126,10 +126,10 @@
                                                     </td>
                                                     <td
                                                         style="width: 100%;height:100%;"
-                                                        class="form-delete-jadwal2 bg-secondary justify-content-between"
+                                                        class="form-delete-jadwal2 bg-dark justify-content-between"
                                                     >
                                                         <span class="text-light">Hapus data?</span>
-                                                        <div clas="d-flex justify-content-between" style="width: 200px;">
+                                                        <div clas="d-flex justify-content-between border border-danger" style="width: 200px;">
                                                             <Button data-id-jadwal="${x.id_jadwal}" class="btn col-5 btn-danger delete-jadwal-btn btn-sm">Yes</Button>
                                                             <Button class="btn col-5 btn-primary btn-sm">No</Button>
                                                         </div>

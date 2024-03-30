@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 29, 2024 at 05:07 PM
+-- Generation Time: Mar 30, 2024 at 06:30 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -65,20 +65,18 @@ CREATE TABLE `dokumentasi` (
 CREATE TABLE `jadwal_vaksin` (
   `id_jadwal` int(11) NOT NULL,
   `id_vaksin` int(11) NOT NULL,
-  `tgl_pemberian` date DEFAULT NULL,
-  `rizky_bgst` varchar(20) NOT NULL
+  `tgl_pemberian` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `jadwal_vaksin`
 --
 
-INSERT INTO `jadwal_vaksin` (`id_jadwal`, `id_vaksin`, `tgl_pemberian`, `rizky_bgst`) VALUES
-(3, 3, '2024-03-26', ''),
-(4, 5, '2023-12-11', 'lorem_ipsum'),
-(5, 5, '2024-04-15', ''),
-(6, 5, '2024-03-22', ''),
-(7, 3, '2024-03-27', '');
+INSERT INTO `jadwal_vaksin` (`id_jadwal`, `id_vaksin`, `tgl_pemberian`) VALUES
+(6, 5, '2024-03-22'),
+(10, 3, '2024-03-19'),
+(11, 3, '2024-03-28'),
+(12, 3, '2024-03-05');
 
 -- --------------------------------------------------------
 
@@ -209,7 +207,7 @@ ALTER TABLE `dokumentasi`
 -- AUTO_INCREMENT for table `jadwal_vaksin`
 --
 ALTER TABLE `jadwal_vaksin`
-  MODIFY `id_jadwal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_jadwal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `pemilik_ternak`
