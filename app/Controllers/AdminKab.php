@@ -203,16 +203,22 @@ class AdminKab extends BaseController
         );
         return view("container", $data);
     }
-    public function input_jadwal($id_vaksinasi)
+    public function input_jadwal()
     {
         $validation = \Config\Services::validation();
         $jadwalVaksinModel = new JadwalVaksinModel;
         $id_jadwal = $this->request->getVar("id_jadwal");
         $data = array(
-            "id_vaksin" => $id_vaksinasi,
+            "id_vaksin" => $this->request->getPost("id_vaksin"),
             "tgl_pemberian" => $this->request->getPost("tgl_pemberian")
         );
         $rules = [
+            'id_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'ID Vaksin harus diisi.',
+                ],
+            ],
             'tgl_pemberian' => [
                 'rules'  => 'required',
                 'errors' => [
@@ -249,6 +255,24 @@ class AdminKab extends BaseController
             );
         }
         return redirect()->to("admin_kab/data_jadwal_vaksin");
+    }
+    public function edit_jadwal($id_jadwal)
+    {
+        $dataJadwalVaksinModel = new JadwalVaksinModel;
+
+        // $newformat = date('Y-m-d', $this->request->getJsonVar("tgl_pemberian"));
+        $data = array(
+            // "tgl_pemberian" => $this->request->getPost("tgl_pemberian"),
+            "tgl_pemberian" => $this->request->getJsonVar("tgl_pemberian"),
+        );
+        $dataJadwalVaksinModel->update($id_jadwal, $data);
+        return $this->response->setStatusCode(200);
+    }
+    public function delete_jadwal($id_jadwal)
+    {
+        $dataJadwalVaksinModel = new JadwalVaksinModel;
+        $dataJadwalVaksinModel->delete($id_jadwal);
+        return $this->response->setStatusCode(200);
     }
     public function data_jadwal_vaksin_detail($id_vaksinasi)
     {

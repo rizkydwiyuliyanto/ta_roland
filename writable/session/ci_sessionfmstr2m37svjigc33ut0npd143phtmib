@@ -1,6 +1,0 @@
-__ci_last_regenerate|i:1711506123;user|a:4:{s:2:"id";s:4:"9101";s:14:"nama_kabupaten";s:13:"KOTA JAYAPURA";s:8:"username";s:1:"s";s:8:"password";s:2:"wd";}_ci_previous_url|s:50:"http://127.0.0.1/vaksinasi/admin_kab/data_peternak";message|s:271:"
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                   Success
-                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            ";__ci_vars|a:1:{s:7:"message";s:3:"old";}

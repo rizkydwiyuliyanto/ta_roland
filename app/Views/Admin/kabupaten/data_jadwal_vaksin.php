@@ -7,10 +7,10 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Tambah data peternak</h1>
+                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Tambah data jadwal vaksin</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form method="post" action="<?php echo base_url("admin_kab/add_peternak") . "?kabupaten=" . session()->get("user")["id"] ?>">
+                        <form method="post" action="<?php echo base_url("admin_kab/input_jadwal")?>">
                             <div class="modal-body">
                                 <div class="mb-4">
                                     <label for="id_vaksin" class="form-label fw-bold" style="line-height: 0.75;color:#636363">Vaksin *</label>

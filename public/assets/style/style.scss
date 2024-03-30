@@ -25,6 +25,38 @@
     }
 }
 
+.form-delete-jadwal {
+    background-color: #cacaca;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top:0;
+    height: 100%;
+    right: -140px;
+    // border:2px solid #05ff7e;
+    // padding: 10px;
+    transition: right 0.7s ease-in-out;
+}
+.data-jadwal {
+    opacity: 1;
+    transition: opacity 0.37s linear;
+}
+.form-delete-jadwal2 {
+    position: absolute;
+    top:0;
+    // left: 0px;
+    right:0;
+    bottom:0;
+    // z-index: 100;
+    display: none;
+    background-color: rgb(212, 7, 7);
+}
+
+.show {
+    display: flex;
+}
+
 .form-login {
     background-color: #F4F4F4;
     width: 380px;
