@@ -24,11 +24,223 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.0.2/js/dataTables.bootstrap5.js"></script>
+    <?php if ($page == "Admin/kabupaten/data_dokumentasi.php") { ?>
+        <script>
+            const btnDokumentasi = document.querySelectorAll(".btn-dokumentasi");
+            const fn_inputImage = (input, preview) => {
+                const inputImage = input;
+                const previewImageElem = preview;
+                const compressImage = async (file, {
+                    quality = 1,
+                    type = file.type
+                }) => {
+                    // Get as image data
+                    const imageBitmap = await createImageBitmap(file);
+
+                    // Draw to canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = imageBitmap.width;
+                    canvas.height = imageBitmap.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(imageBitmap, 0, 0);
+
+                    // Turn into Blob
+                    const blob = await new Promise((resolve) =>
+                        canvas.toBlob(resolve, type, quality)
+                    );
+
+                    // Turn Blob into File
+                    return new File([blob], file.name, {
+                        type: blob.type,
+                    });
+                };
+                const dataTransfer = new DataTransfer();
+                inputImage.onchange = async (e) => {
+                    const [file] = inputImage.files;
+                    if (file) {
+                        // We don't have to compress files that aren't images
+                        if (!file.type.startsWith('image')) {
+                            // Ignore this file, but do add it to our result
+                            dataTransfer.items.add(file);
+                        }
+
+                        // We compress the file by 50%
+                        const compressedFile = await compressImage(file, {
+                            quality: 0.25,
+                            type: 'image/jpeg',
+                        });
+                        previewImageElem.previousElementSibling.style.display = "none";
+                        previewImageElem.style.display = "block";
+                        previewImageElem.src = URL.createObjectURL(compressedFile);
+                    }
+                }
+            }
+            let modalWrapDokumentasi = null;
+            let data2;
+            let body2 = [{
+                    "content": ""
+                },
+                {
+                    "content": ""
+                },
+            ]
+            let idx2 = 0;
+            let showModalDokumentasi = (x) => {
+                body2[idx2].content = ""
+                body2[idx2].id = ""
+                var xmlhttp = new XMLHttpRequest();
+
+                xmlhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        let a = JSON.parse(this.responseText);
+                        console.log(a);
+                        body2[idx2].content = `
+                            <div class="d-flex flex-column">
+                                <div class="grid-parent">
+                                    ${a["data"].map((x, idx) => {
+                                        return (
+                                            `
+                                                <div>
+                                                    <button data-id-dokumentasi="${x.id_dokumentasi}" data-text="${x.text}" data-foto="${x["foto"]}" class="btn btn-primary btn-edit-dokumentasi btn-sm">EDIT</button>
+                                                    <button data-id-dokumentasi="${x.id_dokumentasi}" class="btn btn-danger ms-2 btn-delete-dokumentasi btn-sm">DELETE</button>
+                                                    <div style="background-color: #a5a5a5;width:100%;height:200px;cursor:pointer;" data-id-src="${x["foto"]}" data-id-image="${x["id_dokumentasi"]}" class="rounded mt-2 image-parent boxShadow d-flex align-items-center justify-content-center overflow-hidden mb-2">
+                                                        <img src="${x["foto"]}" alt="${idx}" style="width:100%;height:100%;object-fit:cover;">
+                                                    </div>
+                                                </div>
+                                            `
+                                        )
+                                    }).join("")}
+                                </div>
+                            </div>
+                        `
+                        document.getElementById("data").innerHTML = body2[idx2].content;
+                        const btnEditDokumentasi = document.querySelectorAll(".btn-edit-dokumentasi");
+                        const btnDeleteDokumentasi = document.querySelectorAll(".btn-delete-dokumentasi");
+                        const backBtnDokumentasi = document.querySelectorAll(".btn-back-dokumentasi")
+                        // console.log(backBtnDokumentasi)
+                        backBtnDokumentasi.forEach((elem, idx) => {
+                            elem.onclick = () => {
+                                document.getElementById("data").innerHTML = "Loading..."
+                                showModalDokumentasi(data2);
+                                // modalWrap.remove();
+                            }
+                        })
+                        btnDeleteDokumentasi.forEach((elem, idx) => {
+                            const idDokumentasi = elem.getAttribute("data-id-dokumentasi");
+                            elem.onclick = () => {
+                                window.location.href = "<?php echo base_url("admin_kab/delete_dokumentasi/") ?>"+idDokumentasi
+                            }
+                        })
+                        btnEditDokumentasi.forEach((elem, idx) => {
+                            const idDokumentasi = elem.getAttribute("data-id-dokumentasi");
+                            const text = elem.getAttribute("data-text");
+                            const foto = elem.getAttribute("data-foto");
+                            elem.onclick = () => {
+                                idx2 = 1;
+                                body2[idx2].content = `
+                                <form method="post" id="form-dokumentasi" action="<?php echo base_url("admin_kab/edit_dokumentasi/") ?>${idDokumentasi}" enctype="multipart/form-data">
+                                        <input type="hidden" name="_method" value="PUT">
+                                        <div class="modal-body">
+                                            <div class="mb-4">
+                                                <span></span>
+                                            </div>
+                                            <div style="background-color: #a5a5a5;width:100%;height:200px;" class="rounded position-relative d-flex align-items-center justify-content-center overflow-hidden mb-2">
+                                                <span style="color:white;font-size:40px">+</span>
+                                                <img src="${foto}" class="preview-image" id="preview-image2" alt="previewImage" style="display:block;position: absolute;width:100%;height:100%;object-fit:cover;">
+                                                <input name="foto" style="position: absolute;height:100%;width:100%;opacity:0;" class="form-control" id="input-image2" type="file" accept="image/*">
+                                            </div>
+                                            <div>
+                                                <label for="keterangan" class="form-label">Keterangan</label>
+                                                <textarea class="form-control" name="keterangan" id="keterangan" rows="2">${text}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-primary" id="btn-edit-dokumentasi" style="width: 170px;" type="submit">
+                                                Submit
+                                            </button>
+                                        </div>
+                                    </form>
+                                `
+                                document.getElementById("data").innerHTML = body2[idx2].content;
+                                // document.getElementById("form-dokumentasi").onsubmit = (e) => {
+                                //     e.preventDefault();
+                                // }
+                                document.getElementById("btn-edit-dokumentasi").onclick = () => {
+                                    const formData = new FormData(document.getElementById("form-dokumentasi"));
+                                    // let formData2 = new FormData();
+                                    // formData2.append("keterangan", "FFIIKSKS");
+                                    // // console.log(formData);
+                                    // fetch(`<?php echo base_url("admin_kab/edit_dokumentasi/") ?>${idDokumentasi}`, {
+                                    //     body: formData2,
+                                    //     method: "put"
+                                    // }).then(response => {
+                                    //     console.log(formData2);
+                                    //     response.json().then(e => {
+                                    //         console.log(e);
+                                    //     })
+                                    // }).catch(err => {
+                                    //     console.log(err);
+                                    // });
+                                }
+                                fn_inputImage(
+                                    document.getElementById("input-image2"),
+                                    document.getElementById("preview-image2")
+                                );
+                            }
+                        })
+                    };
+                };
+
+                xmlhttp.open("GET", "<?php echo base_url("admin_kab/data_dokumentasi/detail/") ?>" + x, true);
+                xmlhttp.send();
+
+            }
+            btnDokumentasi.forEach((elem, idx) => {
+                elem.onclick = () => {
+                    const idJadwal = elem.getAttribute("data-id-jadwal");
+                    data2 = idJadwal;
+                    if (modalWrapDokumentasi !== null) {
+                        modalWrapDokumentasi.remove();
+                    };
+                    modalWrapDokumentasi = document.createElement("div");
+                    modalWrapDokumentasi.innerHTML = `
+                        <div class="modal modal-xl fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Dokumentasi</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div id="data">
+                                            <span>Loading...</span>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button class="btn btn-info btn-back-dokumentasi" style="width: 90px;" type="submit">
+                                            Back
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `
+                    document.body.append(modalWrapDokumentasi);
+                    let modal = new bootstrap.Modal(modalWrapDokumentasi.querySelector(".modal"));
+                    modal.show();
+                    showModalDokumentasi(data2);
+                }
+            });
+            fn_inputImage(
+                document.getElementById("input-image"),
+                document.getElementById("preview-image")
+            );
+        </script>
+    <?php } ?>
     <?php if ($page == "Admin/kabupaten/data_jadwal_vaksin.php") { ?>
         <script>
             const btnJadwalModal = document.querySelectorAll(".btn-modal-jadwal");
             let idJadwalVaksin = "";
-            let myModal, myModalEl;
             let modalWrap = null;
             let body = [{
 

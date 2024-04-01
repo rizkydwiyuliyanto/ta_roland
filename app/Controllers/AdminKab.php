@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\DokumentasiModel;
 use App\Models\JadwalVaksinModel;
 use App\Models\KabupatenModel;
 use App\Models\PeternakModel;
@@ -175,23 +176,22 @@ class AdminKab extends BaseController
     }
     public function data_jadwal_vaksin()
     {
+        $status = $this->request->getVar("status");
         $vaksinModel = new VaksinModel;
         $dataJadwalVaksin = "";
         $id_kab = session()->get("user")["id"];
-        $dataJadwalVaksin = $vaksinModel->join(
-            "pemilik_ternak",
-            "pemilik_ternak.id_pemilik_ternak = vaksinasi.id_peternak",
-            "left"
-        )->join(
-            ""
-        )
-            ->where(
+        if ($status == "0" or $status == "") {
+            $dataJadwalVaksin = $vaksinModel->join(
+                "pemilik_ternak",
+                "pemilik_ternak.id_pemilik_ternak = vaksinasi.id_peternak",
+                "left"
+            )->where(
                 "pemilik_ternak.id_kab",
                 $id_kab
             )->findAll();
-
+        }
         $data = array(
-            "page" => "Admin/kabupaten/data_dokumentasi.php",
+            "page" => "Admin/kabupaten/data_jadwal_vaksin.php",
             "data_jadwal_vaksin" => $dataJadwalVaksin
         );
         return view("container", $data);
@@ -297,11 +297,129 @@ class AdminKab extends BaseController
     }
     public function data_dokumentasi()
     {
+        $vaksinModel = new VaksinModel;
+        $dataJadwalVaksin = "";
+        $id_kab = session()->get("user")["id"];
+        $dataJadwalVaksin = $vaksinModel->join(
+            "pemilik_ternak",
+            "pemilik_ternak.id_pemilik_ternak = vaksinasi.id_peternak",
+            "left"
+        )->join(
+            "jadwal_vaksin",
+            "jadwal_vaksin.id_vaksin = vaksinasi.id_vaksinasi",
+            "left"
+        )->whereIn(
+            "vaksinasi.id_vaksinasi",
+            db_connect()->table(
+                "jadwal_vaksin"
+            )->select("id_vaksin")
+        )
+            ->where(
+                "pemilik_ternak.id_kab",
+                $id_kab
+            )->findAll();
 
         $data = array(
-            "page" => "Admin/kabupaten/data_dokumentasi.php"
+            "page" => "Admin/kabupaten/data_dokumentasi.php",
+            "data_dokumentasi" => $dataJadwalVaksin
         );
         return view("container", $data);
+    }
+    public function data_dokumentasi_detail($id_jadwal)
+    {
+        $dokumentasiModel = new DokumentasiModel;
+        $data["data"] = $dokumentasiModel->where("id_jadwal", $id_jadwal)->findAll();
+        return $this->response->setStatusCode(200)->setJSON($data);
+    }
+    public function add_dokumentasi()
+    {
+        $dokumentasiModel = new DokumentasiModel;
+        $validationRule = [
+            "id_jadwal" => [
+                "rules" => [
+                    "required[id_jadwal]"
+                ]
+            ],
+            'foto' => [
+                'label' => 'Image File',
+                'rules' => [
+                    'uploaded[foto]',
+                    'is_image[foto]',
+                    'mime_in[foto,image/jpg,image/jpeg,image/gif,image/png,image/webp]'
+                ],
+            ],
+        ];
+        $uniqueId = time() . '-' . mt_rand();
+        if (!$this->validate($validationRule)) {
+            // $arr = array();
+            // foreach ($errors as $e) :
+            //     array_push($arr, $this->notValidMessage($e));
+            // endforeach;
+            // $str = implode("", $arr);
+            // session()->setFlashdata(
+            //     "message",
+            //     $str
+            // );
+            $error = ['errors' => $this->validator->getErrors()];
+            session()->setFlashdata(
+                "message",
+                '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span style="margin-right: 6px;">Failed</span> :(
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>'
+            );
+            return redirect("admin_kab/data_dokumentasi");
+        } else {
+            $img = $this->request->getFile("foto");
+            $id_jadwal = $this->request->getPost("id_jadwal");
+            if (!$img->hasMoved()) {
+                $imgName = $img->getName();
+                $img->move("../public/uploads/jadwal/images/" . $id_jadwal . "/", $imgName);
+                $filepath = base_url() . "uploads/jadwal/images/" . $id_jadwal . "/" . $imgName;
+                $data = array(
+                    "id_jadwal" => $id_jadwal,
+                    "foto" => $filepath,
+                    "text" => $this->request->getPost("keterangan"),
+                );
+                $dokumentasiModel->insert($data);
+                session()->setFlashdata(
+                    "message",
+                    '<div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span style="margin-right: 6px;">Success</span> :)
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>'
+                );
+                return redirect("admin_kab/data_dokumentasi");
+            }
+        }
+    }
+    public function edit_dokumentasi($id_dokumentasi)
+    {
+        $dokumentasiModel = new DokumentasiModel;
+        $foto = "";
+        $text = $this->request->getPost("keterangan");
+        $a = [];
+        if (is_uploaded_file($this->request->getFile("foto"))) {
+            $data = $dokumentasiModel->where("id_dokumentasi", $id_dokumentasi)->first();
+            $foto = $this->request->getFile("foto");
+            if (!$foto->hasMoved()) {
+                $imgName = $foto->getName();
+                $foto->move("../public/uploads/jadwal/images/" . $data["id_jadwal"] . "/", $imgName);
+                $filepath = base_url() . "uploads/jadwal/images/" . $data["id_jadwal"] . "/" . $imgName;
+                $foto = $filepath;
+                $a["foto"] = $foto;
+            };
+        };
+        $a["text"] = $text;
+        $dokumentasiModel->update($id_dokumentasi, $a);
+        // return $this->response->setStatusCode(200)->setJSON(array("data" => $text));
+        return redirect("admin_kab/data_dokumentasi");
+    }
+    public function delete_dokumentasi($id_dokumentasi)
+    {
+        $dokumentasiModel = new DokumentasiModel;
+        $dokumentasiModel->delete($id_dokumentasi);
+        return redirect("admin_kab/data_dokumentasi");
     }
     public function add_peternak()
     {

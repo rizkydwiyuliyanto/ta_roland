@@ -4,6 +4,18 @@
     --left: 270px;
     --top: 90px;
 }
+.grid-parent {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    // gap: 12px;
+    // border: 2px solid red;
+    row-gap: 14px;
+    column-gap: 18px;
+}
+
+.boxShadow {
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
+}
 
 .btn-submit {
     font-size: 17px;

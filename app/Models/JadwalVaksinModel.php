@@ -9,6 +9,6 @@ class JadwalVaksinModel extends Model
     protected $table = 'jadwal_vaksin';
     protected $primaryKey = "id_jadwal";
     protected $allowedFields = [
-        'id_jadwal', 'id_vaksin', "tgl_pemberian", "rizky_bgst"
+        'id_jadwal', 'id_vaksin', "tgl_pemberian"
     ];
 }

@@ -29,6 +29,11 @@ $routes->group("admin_kab", function ($routes) {
     $routes->get("data_jadwal_vaksin/detail/(:any)", "AdminKab::data_jadwal_vaksin_detail/$1", ['filter' => 'authGuard']);
     $routes->get("data_jadwal_vaksin", "AdminKab::data_jadwal_vaksin", ['filter' => 'authGuard']);
     $routes->get("data_dokumentasi", "AdminKab::data_dokumentasi", ['filter' => 'authGuard']);
+    $routes->post("add_dokumentasi", "AdminKab::add_dokumentasi", ['filter' => 'authGuard']);
+    $routes->post("add_dokumentasi", "AdminKab::add_dokumentasi", ['filter' => 'authGuard']);
+    $routes->put("edit_dokumentasi/(:any)", "AdminKab::edit_dokumentasi/$1", ['filter' => 'authGuard']);
+    $routes->get("delete_dokumentasi/(:any)", "AdminKab::delete_dokumentasi/$1", ['filter' => 'authGuard']);
+    $routes->get("data_dokumentasi/detail/(:any)", "AdminKab::data_dokumentasi_detail/$1", ['filter' => 'authGuard']);
 });
 $routes->get("login", "Auth::login");
 $routes->post("save_auth", "Auth::save_auth");
