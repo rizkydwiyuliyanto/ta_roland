@@ -5,8 +5,10 @@ namespace App\Controllers;
 use App\Models\DokumentasiModel;
 use App\Models\JadwalVaksinModel;
 use App\Models\KabupatenModel;
+use App\Models\PesertaModel;
 use App\Models\PeternakModel;
-use App\Models\VaksinModel;
+use App\Models\UsulanModel;
+use App\Models\JenisVaksinModel;
 use CodeIgniter\Database\BaseBuilder;
 
 class AdminKab extends BaseController
@@ -30,21 +32,196 @@ class AdminKab extends BaseController
     public function data_peternak()
     {
         $peternakModel = new PeternakModel;
+        $usulanModel = new UsulanModel;
         $id_kab = session()->get("user")["id"];
         $data = array(
             "page" => "Admin/kabupaten/data_peternak.php",
-            "data_peternak" => $peternakModel->join("admin_kabupaten", "admin_kabupaten.id_kab=pemilik_ternak.id_kab", "left")->where("pemilik_ternak.id_kab", $id_kab)->findAll(80)
+            "data_peternak" => $peternakModel->select(
+                "
+                    pemilik_ternak.nik,
+                    pemilik_ternak.id_usulan,
+                    pemilik_ternak.id_kab,
+                    pemilik_ternak.nama_pemilik,
+                    pemilik_ternak.alamat AS alamat_pemilik,
+                    pemilik_ternak.no_hp AS no_hp_pemilik,
+                    pemilik_ternak.jumlah_ternak AS jumlah_ternak_pemilik,
+                    admin_kabupaten.nama_kabupaten,
+                    usulan.nama AS usulan_vaksin,
+                    usulan.alamat AS alamat_usulan,
+                    usulan.no_hp AS no_hp_usulan,
+                    usulan.jumlah_ternak AS jumlah_ternak_usulan
+                "
+            )->join(
+                "admin_kabupaten",
+                "admin_kabupaten.id_kab=pemilik_ternak.id_kab",
+                "left"
+            )->join(
+                "usulan",
+                "usulan.id=pemilik_ternak.id_usulan",
+                "left"
+            )
+                ->where("pemilik_ternak.id_kab", $id_kab)->findAll(80)
         );
         return view("container", $data);
+    }
+    public function jadwal_vaksin()
+    {
+        $jenisVaksinModel = new JenisVaksinModel;
+        $jadwalVaksinModel = new JadwalVaksinModel;
+        $data = array(
+            "page" => "admin/kabupaten/jadwal_vaksin.php",
+            "jadwal_vaksin" => $jadwalVaksinModel->join(
+                "jenis_vaksin",
+                "jadwal_vaksin.id_jenis_vaksin=jenis_vaksin.id",
+                "left"
+            )->findAll(),
+            "jenis_vaksin" => $jenisVaksinModel->findAll()
+        );
+        return view("container", $data);
+    }
+    public function detail_jadwal_vaksin($idJadwalVaksin)
+    {
+        $jadwalVaksinModel = new JadwalVaksinModel;
+        $jenisVaksinModel = new JenisVaksinModel;
+        $data = array(
+            "detail_jadwal_vaksin" => $jadwalVaksinModel->where("id_jadwal", $idJadwalVaksin)->first(),
+            "data_jenis_vaksin" => $jenisVaksinModel->findAll()
+        );
+        return $this->response->setStatusCode(200)->setJSON(array("data" => $data));
+    }
+    public function add_jadwal_vaksin()
+    {
+        $validation = \Config\Services::validation();
+        $jadwalVaksinModel = new JadwalVaksinModel;
+        $data = array(
+            "id_jenis_vaksin" => $this->request->getPost("jenis"),
+            "hari_vaksin" => $this->request->getPost("hari"),
+            "tgl_vaksin" => $this->request->getPost("tgl_vaksin")
+        );
+        $rules = [
+            'id_jenis_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'ID Jenis Vaksin harus diisi.',
+                ],
+            ],
+            'hari_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Hari harus diisi.',
+                ],
+            ],
+            'tgl_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Tanggal vaksin harus diisi.',
+                ],
+            ]
+        ];
+        $validation->setRules($rules);
+        if ($validation->run($data)) {
+            $jadwalVaksinModel->insert($data);
+            session()->setFlashdata(
+                "message",
+                '
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                   Success
+                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            '
+            );
+        } else {
+            $errors = $validation->getErrors();
+            $arr = array();
+            foreach ($errors as $e) :
+                array_push($arr, $this->notValidMessage($e));
+            endforeach;
+            $str = implode("", $arr);
+            session()->setFlashdata(
+                "message",
+                $str
+            );
+        }
+        return redirect()->to("admin_kab/jadwal_vaksin");
+    }
+    public function edit_jadwal_vaksin($idJadwalVaksin)
+    {
+        $validation = \Config\Services::validation();
+        $jadwalVaksinModel = new JadwalVaksinModel;
+        $data = array(
+            "id_jenis_vaksin" => $this->request->getPost("jenis"),
+            "hari_vaksin" => $this->request->getPost("hari"),
+            "tgl_vaksin" => $this->request->getPost("tgl_vaksin")
+        );
+        $rules = [
+            'id_jenis_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'ID Jenis Vaksin harus diisi.',
+                ],
+            ],
+            'hari_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Hari harus diisi.',
+                ],
+            ],
+            'tgl_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Tanggal vaksin harus diisi.',
+                ],
+            ]
+        ];
+        $validation->setRules($rules);
+        if ($validation->run($data)) {
+            $jadwalVaksinModel->update($idJadwalVaksin, $data);
+            session()->setFlashdata(
+                "message",
+                '
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                   Success
+                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            '
+            );
+        } else {
+            $errors = $validation->getErrors();
+            $arr = array();
+            foreach ($errors as $e) :
+                array_push($arr, $this->notValidMessage($e));
+            endforeach;
+            $str = implode("", $arr);
+            session()->setFlashdata(
+                "message",
+                $str
+            );
+        }
+        return redirect()->to("admin_kab/jadwal_vaksin");
+    }
+    public function delete_jadwal_vaksin($id_jadwal_vaksin)
+    {
+        $jadwalVaksinModel = new JadwalVaksinModel;
+        $jadwalVaksinModel->delete($id_jadwal_vaksin);
+        session()->setFlashdata(
+            "message",
+            '
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+               Success
+               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        '
+        );
+        return redirect()->to("admin_kab/jadwal_vaksin");
     }
     public function data_vaksin()
     {
         $peternakModel = new PeternakModel;
-        $vaksinModel = new VaksinModel;
+        $jenisVaksinModel = new JenisVaksinModel;
         $id_kab = session()->get("user")["id"];
         $data = array(
             "page" => "Admin/kabupaten/data_vaksin.php",
-            "data_vaksin" => $vaksinModel->join("pemilik_ternak", "pemilik_ternak.id_pemilik_ternak=vaksinasi.id_peternak", "left")->findAll(80),
+            "data_vaksin" => $jenisVaksinModel->join("pemilik_ternak", "pemilik_ternak.nik=vaksinasi.id_peternak", "left")->where("pemilik_ternak.id_kab", $id_kab)->findAll(80),
             "data_peternak" => $peternakModel->where("pemilik_ternak.id_kab", $id_kab)->findAll()
         );
         return view("container", $data);
@@ -52,7 +229,7 @@ class AdminKab extends BaseController
     public function add_vaksin()
     {
         $validation = \Config\Services::validation();
-        $vaksinModel = new VaksinModel;
+        $jenisVaksinModel = new JenisVaksinModel;
         $data = array(
             "id_peternak" => $this->request->getPost("id_peternak"),
             "jumlah_dosis" => $this->request->getPost("jumlah_dosis"),
@@ -80,7 +257,7 @@ class AdminKab extends BaseController
         ];
         $validation->setRules($rules);
         if ($validation->run($data)) {
-            $vaksinModel->insert($data);
+            $jenisVaksinModel->insert($data);
             session()->setFlashdata(
                 "message",
                 '
@@ -106,8 +283,8 @@ class AdminKab extends BaseController
     }
     public function delete_vaksin($id_vaksin)
     {
-        $vaksinModel = new VaksinModel;
-        $vaksinModel->delete($id_vaksin);
+        $jenisVaksinModel = new JenisVaksinModel;
+        $jenisVaksinModel->delete($id_vaksin);
         session()->setFlashdata(
             "message",
             '
@@ -122,7 +299,7 @@ class AdminKab extends BaseController
     public function edit_vaksin($id_vaksin)
     {
         $validation = \Config\Services::validation();
-        $vaksinModel = new VaksinModel;
+        $jenisVaksinModel = new JenisVaksinModel;
         $data = array(
             "id_peternak" => $this->request->getPost("id_peternak"),
             "jumlah_dosis" => $this->request->getPost("jumlah_dosis"),
@@ -150,7 +327,7 @@ class AdminKab extends BaseController
         ];
         $validation->setRules($rules);
         if ($validation->run($data)) {
-            $vaksinModel->update($id_vaksin, $data);
+            $jenisVaksinModel->update($id_vaksin, $data);
             session()->setFlashdata(
                 "message",
                 '
@@ -174,99 +351,7 @@ class AdminKab extends BaseController
         }
         return redirect()->to("admin_kab/data_vaksin");
     }
-    public function data_jadwal_vaksin()
-    {
-        $status = $this->request->getVar("status");
-        $vaksinModel = new VaksinModel;
-        $dataJadwalVaksin = "";
-        $id_kab = session()->get("user")["id"];
-        if ($status == "0" or $status == "") {
-            $dataJadwalVaksin = $vaksinModel->join(
-                "pemilik_ternak",
-                "pemilik_ternak.id_pemilik_ternak = vaksinasi.id_peternak",
-                "left"
-            )->where(
-                "pemilik_ternak.id_kab",
-                $id_kab
-            )->findAll();
-        }
-        $data = array(
-            "page" => "Admin/kabupaten/data_jadwal_vaksin.php",
-            "data_jadwal_vaksin" => $dataJadwalVaksin
-        );
-        return view("container", $data);
-    }
-    public function input_jadwal()
-    {
-        $validation = \Config\Services::validation();
-        $jadwalVaksinModel = new JadwalVaksinModel;
-        $id_jadwal = $this->request->getVar("id_jadwal");
-        $data = array(
-            "id_vaksin" => $this->request->getPost("id_vaksin"),
-            "tgl_pemberian" => $this->request->getPost("tgl_pemberian")
-        );
-        $rules = [
-            'id_vaksin' => [
-                'rules'  => 'required',
-                'errors' => [
-                    'required' => 'ID Vaksin harus diisi.',
-                ],
-            ],
-            'tgl_pemberian' => [
-                'rules'  => 'required',
-                'errors' => [
-                    'required' => 'Tanggal pemberian harus diisi.',
-                ],
-            ]
-        ];
-        $validation->setRules($rules);
-        if ($validation->run($data)) {
-            if ($id_jadwal == "") {
-                $jadwalVaksinModel->insert($data);
-            } else {
-                $jadwalVaksinModel->update($id_jadwal, $data);
-            };
-            session()->setFlashdata(
-                "message",
-                '
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                   Success
-                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            '
-            );
-        } else {
-            $errors = $validation->getErrors();
-            $arr = array();
-            foreach ($errors as $e) :
-                array_push($arr, $this->notValidMessage($e));
-            endforeach;
-            $str = implode("", $arr);
-            session()->setFlashdata(
-                "message",
-                $str
-            );
-        }
-        return redirect()->to("admin_kab/data_jadwal_vaksin");
-    }
-    public function edit_jadwal($id_jadwal)
-    {
-        $dataJadwalVaksinModel = new JadwalVaksinModel;
 
-        // $newformat = date('Y-m-d', $this->request->getJsonVar("tgl_pemberian"));
-        $data = array(
-            // "tgl_pemberian" => $this->request->getPost("tgl_pemberian"),
-            "tgl_pemberian" => $this->request->getJsonVar("tgl_pemberian"),
-        );
-        $dataJadwalVaksinModel->update($id_jadwal, $data);
-        return $this->response->setStatusCode(200);
-    }
-    public function delete_jadwal($id_jadwal)
-    {
-        $dataJadwalVaksinModel = new JadwalVaksinModel;
-        $dataJadwalVaksinModel->delete($id_jadwal);
-        return $this->response->setStatusCode(200);
-    }
     public function data_jadwal_vaksin_detail($id_vaksinasi)
     {
         $dataJadwalVaksin = "";
@@ -278,7 +363,7 @@ class AdminKab extends BaseController
             "left"
         )->join(
             "pemilik_ternak",
-            "pemilik_ternak.id_pemilik_ternak = vaksinasi.id_peternak",
+            "pemilik_ternak.nik = vaksinasi.id_peternak",
             "left"
         )->where(
             "vaksinasi.id_vaksinasi",
@@ -297,12 +382,12 @@ class AdminKab extends BaseController
     }
     public function data_dokumentasi()
     {
-        $vaksinModel = new VaksinModel;
+        $jenisVaksinModel = new JenisVaksinModel;
         $dataJadwalVaksin = "";
         $id_kab = session()->get("user")["id"];
-        $dataJadwalVaksin = $vaksinModel->join(
+        $dataJadwalVaksin = $jenisVaksinModel->join(
             "pemilik_ternak",
-            "pemilik_ternak.id_pemilik_ternak = vaksinasi.id_peternak",
+            "pemilik_ternak.nik = vaksinasi.id_peternak",
             "left"
         )->join(
             "jadwal_vaksin",
@@ -477,10 +562,10 @@ class AdminKab extends BaseController
         }
         return redirect()->to("admin_kab/data_peternak");
     }
-    public function delete_peternak($id_pemilik_ternak)
+    public function delete_peternak($nik)
     {
         $peternakModel = new PeternakModel;
-        $peternakModel->delete($id_pemilik_ternak);
+        $peternakModel->delete($nik);
         session()->setFlashdata(
             "message",
             '
@@ -492,15 +577,9 @@ class AdminKab extends BaseController
         );
         return redirect()->to("admin_kab/data_peternak");
     }
-    public function edit_peternak($id_pemilik_ternak)
+    public function edit_peternak($nik)
     {
         $validation = \Config\Services::validation();
-        $peternakModel = new PeternakModel;
-        $data = array(
-            "nama_pemilik" => $this->request->getPost("nama_pemilik"),
-            "no_hp" => $this->request->getPost("no_hp"),
-            "alamat" => $this->request->getPost("alamat")
-        );
         $rules = [
             'nama_pemilik' => [
                 'rules'  => 'required',
@@ -521,9 +600,15 @@ class AdminKab extends BaseController
                 ],
             ],
         ];
+        $peternakModel = new PeternakModel;
+        $data = array(
+            "nama_pemilik" => $this->request->getPost("nama_pemilik"),
+            "no_hp" => $this->request->getPost("no_hp"),
+            "alamat" => $this->request->getPost("alamat")
+        );
         $validation->setRules($rules);
         if ($validation->run($data)) {
-            $peternakModel->update($id_pemilik_ternak, $data);
+            $peternakModel->update($nik, $data);
             session()->setFlashdata(
                 "message",
                 '
@@ -546,5 +631,145 @@ class AdminKab extends BaseController
             );
         }
         return redirect()->to("admin_kab/data_peternak");
+    }
+    public function tambah_usulan()
+    {
+        $usulanModel = new UsulanModel;
+        $usulanModel->insert(
+            array(
+                "nama" => $this->request->getPost("nama"),
+                "alamat" => $this->request->getPost("alamat"),
+                "no_hp" => $this->request->getPost("no_hp"),
+                "jumlah_ternak" => $this->request->getPost("jumlah_ternak"),
+            )
+        );
+        return redirect()->to("admin_kab/data_peternak");
+    }
+
+    public function add_jenis_vaksin()
+    {
+        $jenisVaksinModel = new JenisVaksinModel;
+        $jenisVaksinModel->insert(
+            array(
+                "jenis_vaksin" => $this->request->getPost("jenis")
+            )
+        );
+        return redirect()->to("admin_kab/data_jenis_vaksin");
+    }
+    public function data_peserta()
+    {
+        $pesertaModel = new PesertaModel;
+        $data = array(
+            "data_peserta" => $pesertaModel->join(
+                "pemilik_ternak",
+                "pemilik_ternak.nik=peserta_vaksin.nik",
+                "left"
+            )->join(
+                "jadwal_vaksin",
+                "jadwal_vaksin.id_jadwal=peserta_vaksin.id_jadwal",
+                "left"
+            )->join(
+                "jenis_vaksin",
+                "jenis_vaksin.id=jadwal_vaksin.id_jenis_vaksin",
+                "left"
+            )->findAll(),
+            "page" => "Admin/kabupaten/data_peserta.php"
+        );
+        return view("container", $data);
+    }
+    public function detail_peserta($idPeserta)
+    {
+        $pesertaModel = new PesertaModel;
+        $data = array(
+            "data_peserta" => $pesertaModel->join(
+                "pemilik_ternak",
+                "pemilik_ternak.nik=peserta_vaksin.nik",
+                "left"
+            )->join(
+                "jadwal_vaksin",
+                "jadwal_vaksin.id_jadwal=peserta_vaksin.id_jadwal",
+                "left"
+            )->join(
+                "jenis_vaksin",
+                "jenis_vaksin.id=jadwal_vaksin.id_jenis_vaksin",
+                "left"
+            )->where(
+                "peserta_vaksin.id",
+                $idPeserta
+            )->first()
+        );
+        return $this->response->setStatusCode(200)->setJSON($data);
+    }
+    public function daftar_peserta()
+    {
+        $jadwalVaksinModel = new JadwalVaksinModel;
+        $data = array(
+            "data_jadwal_vaksin" => $jadwalVaksinModel->join(
+                "jenis_vaksin",
+                "jenis_vaksin.id=jadwal_vaksin.id_jenis_vaksin",
+                "left"
+            )->groupBy("jadwal_vaksin.id_jenis_vaksin")->findAll(),
+            "page" => "Admin/kabupaten/daftar_peserta.php"
+        );
+        return view("container", $data);
+    }
+    public function detail_daftar_peserta($idVaksin)
+    {
+        $jadwalVaksinModel = new JadwalVaksinModel;
+        $peternakModel = new PeternakModel;
+        $id_kab = session()->get("user")["id"];
+        $data = array(
+            "jadwal_vaksin" => $jadwalVaksinModel->where("id_jenis_vaksin", $idVaksin)->findAll(),
+            "data_peternak" => $peternakModel->where("id_kab", $id_kab)->findAll()
+        );
+        return $this->response->setStatusCode(200)->setJSON($data);
+    }
+    public function add_peserta()
+    {
+        $pesertaModel = new PesertaModel;
+        $validation = \Config\Services::validation();
+        $rules = [
+            'nik' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Peserta harus diisi.',
+                ],
+            ],
+            'id_jadwal' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Jadwal harus diisi.',
+                ],
+            ]
+        ];
+        $data = array(
+            "nik" => $this->request->getPost("peternak"),
+            "id_jadwal" => $this->request->getPost("jadwal")
+        );
+        $validation->setRules($rules);
+        if ($validation->run($data)) {
+            $pesertaModel->insert($data);
+            session()->setFlashdata(
+                "message",
+                '
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                   Success
+                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            '
+            );
+        } else {
+            $errors = $validation->getErrors();
+            $arr = array();
+            foreach ($errors as $e) :
+                array_push($arr, $this->notValidMessage($e));
+            endforeach;
+            $str = implode("", $arr);
+            session()->setFlashdata(
+                "message",
+                $str
+            );
+        }
+        return redirect()->to("admin_kab/daftar_peserta");
     }
 }

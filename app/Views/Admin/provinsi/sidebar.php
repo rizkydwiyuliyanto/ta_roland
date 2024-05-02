@@ -19,8 +19,8 @@
                     Data Kabupaten
                 </a>
             </li>
-            <li class="container">
-                <a href="">
+            <li class="container <?php echo $page && $page == "Admin/provinsi/laporan.php" ? "active" : "" ?>">
+                <a href="<?php echo base_url("admin_prov/laporan") ?>">
                     Laporan
                 </a>
             </li>

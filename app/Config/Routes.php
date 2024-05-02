@@ -12,6 +12,8 @@ $routes->group('admin_prov', function ($routes) {
     $routes->post("add_kabupaten", "AdminProv::add_kabupaten", ['filter' => 'authGuard']);
     $routes->delete("delete_kabupaten/(:any)", "AdminProv::delete_kabupaten/$1", ['filter' => 'authGuard']);
     $routes->put("edit_kabupaten/(:any)", "AdminProv::edit_kabupaten/$1", ['filter' => 'authGuard']);
+    $routes->get("laporan", "AdminProv::laporan", ['filter' => 'authGuard']);
+    $routes->get("laporan_detail", "AdminProv::laporan_detail", ['filter' => 'authGuard']);
 });
 $routes->group("admin_kab", function ($routes) {
     $routes->get("dashboard", "AdminKab::index", ['filter' => 'authGuard']);
@@ -24,16 +26,24 @@ $routes->group("admin_kab", function ($routes) {
     $routes->delete("delete_vaksin/(:any)", "AdminKab::delete_vaksin/$1", ['filter' => 'authGuard']);
     $routes->put("edit_vaksin/(:any)", "AdminKab::edit_vaksin/$1", ['filter' => 'authGuard']);
     $routes->post("input_jadwal", "AdminKab::input_jadwal", ['filter' => 'authGuard']);
-    $routes->put("edit_jadwal/(:any)", "AdminKab::edit_jadwal/$1", ['filter' => 'authGuard']);
-    $routes->delete("delete_jadwal/(:any)", "AdminKab::delete_jadwal/$1", ['filter' => 'authGuard']);
-    $routes->get("data_jadwal_vaksin/detail/(:any)", "AdminKab::data_jadwal_vaksin_detail/$1", ['filter' => 'authGuard']);
-    $routes->get("data_jadwal_vaksin", "AdminKab::data_jadwal_vaksin", ['filter' => 'authGuard']);
     $routes->get("data_dokumentasi", "AdminKab::data_dokumentasi", ['filter' => 'authGuard']);
     $routes->post("add_dokumentasi", "AdminKab::add_dokumentasi", ['filter' => 'authGuard']);
     $routes->post("add_dokumentasi", "AdminKab::add_dokumentasi", ['filter' => 'authGuard']);
     $routes->put("edit_dokumentasi/(:any)", "AdminKab::edit_dokumentasi/$1", ['filter' => 'authGuard']);
     $routes->get("delete_dokumentasi/(:any)", "AdminKab::delete_dokumentasi/$1", ['filter' => 'authGuard']);
     $routes->get("data_dokumentasi/detail/(:any)", "AdminKab::data_dokumentasi_detail/$1", ['filter' => 'authGuard']);
+    $routes->post("tambah_usulan", "AdminKab::tambah_usulan", ['filter' => 'authGuard']);
+    $routes->post("add_jenis_vaksin", "AdminKab::add_jenis_vaksin", ['filter' => 'authGuard']);
+    $routes->get("jadwal_vaksin", "AdminKab::jadwal_vaksin", ['filter' => 'authGuard']);
+    $routes->get("detail_jadwal_vaksin/(:any)", "AdminKab::detail_jadwal_vaksin/$1", ['filter' => 'authGuard']);
+    $routes->post("add_jadwal_vaksin", "AdminKab::add_jadwal_vaksin", ['filter' => 'authGuard']);
+    $routes->put("edit_jadwal_vaksin/(:any)", "AdminKab::edit_jadwal_vaksin/$1", ['filter' => 'authGuard']);
+    $routes->delete("delete_jadwal_vaksin/(:any)", "AdminKab::delete_jadwal_vaksin/$1", ['filter' => 'authGuard']);
+    $routes->get("daftar_peserta", "AdminKab::daftar_peserta", ['filter' => 'authGuard']);
+    $routes->get("detail_daftar_peserta/(:any)", "AdminKab::detail_daftar_peserta/$1", ['filter' => 'authGuard']);
+    $routes->get("data_peserta", "AdminKab::data_peserta", ['filter' => 'authGuard']);
+    $routes->get("detail_peserta/(:any)", "AdminKab::detail_peserta/$1", ['filter' => 'authGuard']);
+    $routes->post("add_peserta", "AdminKab::add_peserta", ['filter' => 'authGuard']);
 });
 $routes->get("login", "Auth::login");
 $routes->post("save_auth", "Auth::save_auth");

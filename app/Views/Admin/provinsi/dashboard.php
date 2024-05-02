@@ -5,7 +5,7 @@
         <div class="mt-4">
             <div class="my-container">
                 <h2>
-                    Hello world
+                    Dashboard
                 </h2>
             </div>
 

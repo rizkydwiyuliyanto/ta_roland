@@ -7,8 +7,8 @@ use CodeIgniter\Model;
 class PeternakModel extends Model
 {
     protected $table = 'pemilik_ternak';
-    protected $primaryKey = "id_pemilik_ternak";
+    protected $primaryKey = "nik";
     protected $allowedFields = [
-        'id_pemilik_ternak', 'id_kab', "nama_pemilik", "no_hp", "alamat"
+        'nik', 'id_kab', "nama_pemilik", "no_hp", "alamat"
     ];
 }

@@ -14,17 +14,16 @@
     <link rel="stylesheet" type="text/css" href="<?php echo base_url("assets/style/style.css") ?>">
 </head>
 
-<body style="background-color: #EAEFF2;">
+<body>
     <?php if ($page) {
         echo view($page);
     } ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.bootstrap5.js"></script>
-    <?php if ($page == "Admin/kabupaten/data_dokumentasi.php") { ?>
+    <script src="<?php echo base_url("assets/js/kabupaten.js") ?>"></script>
+
+    <?php if ($page && $page == "Admin/kabupaten/data_dokumentasi.php") { ?>
         <script>
             const btnDokumentasi = document.querySelectorAll(".btn-dokumentasi");
             const fn_inputImage = (input, preview) => {
@@ -83,6 +82,9 @@
                 {
                     "content": ""
                 },
+                {
+                    "content": ""
+                }
             ]
             let idx2 = 0;
             let showModalDokumentasi = (x) => {
@@ -102,7 +104,7 @@
                                             `
                                                 <div>
                                                     <button data-id-dokumentasi="${x.id_dokumentasi}" data-text="${x.text}" data-foto="${x["foto"]}" class="btn btn-primary btn-edit-dokumentasi btn-sm">EDIT</button>
-                                                    <button data-id-dokumentasi="${x.id_dokumentasi}" class="btn btn-danger ms-2 btn-delete-dokumentasi btn-sm">DELETE</button>
+                                                    <button data-id-dokumentasi="${x.id_dokumentasi}" data-foto="${x["foto"]}" class="btn btn-danger ms-2 btn-delete-dokumentasi btn-sm">DELETE</button>
                                                     <div style="background-color: #a5a5a5;width:100%;height:200px;cursor:pointer;" data-id-src="${x["foto"]}" data-id-image="${x["id_dokumentasi"]}" class="rounded mt-2 image-parent boxShadow d-flex align-items-center justify-content-center overflow-hidden mb-2">
                                                         <img src="${x["foto"]}" alt="${idx}" style="width:100%;height:100%;object-fit:cover;">
                                                     </div>
@@ -127,8 +129,18 @@
                         })
                         btnDeleteDokumentasi.forEach((elem, idx) => {
                             const idDokumentasi = elem.getAttribute("data-id-dokumentasi");
+                            const foto = elem.getAttribute("data-foto");
                             elem.onclick = () => {
-                                window.location.href = "<?php echo base_url("admin_kab/delete_dokumentasi/") ?>"+idDokumentasi
+                                // window.location.href = "<?php echo base_url("admin_kab/delete_dokumentasi/") ?>" + idDokumentasi;
+                                idx2 = 2;
+                                body2[idx2].content = `
+                                <div style="background-color: #a5a5a5;width:100%;height:200px;" class="rounded position-relative d-flex align-items-center justify-content-center overflow-hidden mb-2">
+                                                <span style="color:white;font-size:40px">+</span>
+                                                <img src="${foto}" class="preview-image" id="preview-image2" alt="previewImage" style="display:block;position: absolute;width:100%;height:100%;object-fit:cover;">
+                                                <input name="foto" style="position: absolute;height:100%;width:100%;opacity:0;" class="form-control" id="input-image2" type="file" accept="image/*">
+                                </div>
+                                `
+                                document.getElementById("data").innerHTML = body2[idx2].content;
                             }
                         })
                         btnEditDokumentasi.forEach((elem, idx) => {
@@ -204,7 +216,7 @@
                     };
                     modalWrapDokumentasi = document.createElement("div");
                     modalWrapDokumentasi.innerHTML = `
-                        <div class="modal modal-xl fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal modal-lg fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -237,218 +249,6 @@
             );
         </script>
     <?php } ?>
-    <?php if ($page == "Admin/kabupaten/data_jadwal_vaksin.php") { ?>
-        <script>
-            const btnJadwalModal = document.querySelectorAll(".btn-modal-jadwal");
-            let idJadwalVaksin = "";
-            let modalWrap = null;
-            let body = [{
-
-                    "content": ""
-                },
-                {
-
-                    "content": ""
-                },
-                {
-                    "content": ""
-                }
-            ]
-            let idx = 0;
-            let data = 0;
-            const editElem = (x) => {
-                x.forEach((elem, idx) => {
-                    elem.onclick = () => {
-                        const tgl = elem.getAttribute("data-id-tgl");
-                        const idJadwal = elem.getAttribute("data-id-jadwal");
-                        idx = 2;
-                        body[idx].content = `
-                                <form id="form-edit">
-                                    <div class="modal-body">
-                                        <div class="input-group d-flex align-items-end col-12">
-                                            <div class="col">
-                                                <label for="tgl_pemberian" class="form-label fw-bold" style="line-height: 0.75;color:#636363">Tanggal pemberian *</label>
-                                                <input value="${tgl}" class="form-control" type="date" name="tgl_pemberian" id="tgl_pemberian">
-                                            </div>
-                                            <button class="btn btn-primary" id="btn-submit" style="width: 170px;">
-                                                Submit
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-
-                                `;
-                        document.getElementById("data").innerHTML = body[idx].content;
-                        const editForm = document.getElementById("form-edit");
-                        const btnSubmit = document.getElementById("btn-submit");
-                        btnSubmit.onclick = () => {
-                            var http = new XMLHttpRequest();
-                            var url = `<?php echo base_url("admin_kab/edit_jadwal/") ?>${idJadwal}`;
-                            const formData = new FormData(editForm);
-                            var object = {};
-                            formData.forEach((value, key) => object[key] = value);
-                            var json = JSON.stringify(object);
-                            http.onreadystatechange = function() { //Call a function when the state changes.
-                                if (http.readyState == 4 && http.status == 200) {
-                                    alert("EDIT BERHASIL");
-                                }
-                            }
-                            http.open('PUT', url, true);
-                            //Send the proper header information along with the request
-                            http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                            http.send(json);
-                        }
-                    }
-                })
-            }
-            const showModal = (x) => {
-                body[idx].content = ""
-                body[idx].id = ""
-                var xmlhttp = new XMLHttpRequest();
-                xmlhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        let a = JSON.parse(this.responseText);
-                        body[idx].content = `
-                                <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Jenis</th>
-                                        <th scope="col">Dosis</th>
-                                        <th scope="col">Tanggal</th>
-                                        <th scope="col"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${a["data"].map((x, idx) => {
-                                        return (
-                                            `
-                                                <tr class="position-relative w-100 h-100 data-jadwal">
-                                                    <td>${x.jenis}</td>
-                                                    <td>${x.jumlah_dosis}</td>
-                                                    <td>${x.tgl_pemberian}</td>
-                                                    <td style="text-align: end;width:140px;">
-                                                        <div class="overflow-hidden h-100 w-100 d-flex justify-content-between ms-auto position-relative">
-                                                            <button data-id-tgl="${x.tgl_pemberian}" class="btn show-form-delete delete-jadwal btn-danger btn-sm">
-                                                                Delete
-                                                            </button>
-                                                            <button data-id-jadwal="${x.id_jadwal}" data-id-tgl="${x.tgl_pemberian}"  class="btn edit-jadwal btn-primary btn-sm">
-                                                                Edit
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                    <td
-                                                        style="width: 100%;height:100%;"
-                                                        class="form-delete-jadwal2 bg-dark justify-content-between"
-                                                    >
-                                                        <span class="text-light">Hapus data?</span>
-                                                        <div clas="d-flex justify-content-between border border-danger" style="width: 200px;">
-                                                            <Button data-id-jadwal="${x.id_jadwal}" class="btn col-5 btn-danger delete-jadwal-btn btn-sm">Yes</Button>
-                                                            <Button class="btn col-5 btn-primary btn-sm">No</Button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            `
-                                        )
-                                    }).join("")}
-                                </tbody>
-                                </table>
-                        `
-                        document.getElementById("data").innerHTML = body[idx].content;
-                        const editJadwal = document.querySelectorAll(".edit-jadwal");
-                        const back = document.querySelectorAll(".back");
-                        const deleteJadwal = document.querySelectorAll(".delete-jadwal");
-                        const deleteJadwalBtn = document.querySelectorAll(".delete-jadwal-btn");
-                        const formDeleteParent = document.querySelectorAll(".show-form-delete");
-                        formDeleteParent.forEach((elem, idx) => {
-                            elem.onclick = () => {
-                                for (let i = 0; i < formDeleteParent.length; i++) {
-                                    let a = document.querySelectorAll(".form-delete-jadwal2")[i];
-                                    if (idx === i) {
-                                        a.classList.add("show");
-                                        a.lastElementChild.onclick = () => {
-                                            a.classList.remove("show");
-                                        }
-                                    } else {
-                                        a.classList.remove("show");
-                                    }
-                                }
-                            }
-                        })
-                        deleteJadwalBtn.forEach((elem, idx) => {
-                            const idJadwal = elem.getAttribute("data-id-jadwal");
-                            elem.onclick = () => {
-                                var xmlhttp = new XMLHttpRequest();
-                                xmlhttp.onreadystatechange = () => {
-                                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                                        let timeOut = setTimeout(() => {
-                                            showModal(data);
-                                        }, 570)
-                                        document.querySelectorAll(".data-jadwal")[idx].style.opacity = 0;
-                                    }
-
-                                }
-                                xmlhttp.open("DELETE", "<?php echo base_url("admin_kab/delete_jadwal/") ?>" + idJadwal, true);
-                                xmlhttp.send()
-                            }
-                        })
-                        editElem(editJadwal)
-                        back.forEach((elem, idx) => {
-                            elem.onclick = () => {
-                                document.getElementById("data").innerHTML = "Loading..."
-                                showModal(data);
-                                // modalWrap.remove();
-                            }
-                        })
-                    };
-                };
-
-                xmlhttp.open("GET", "<?php echo base_url("admin_kab/data_jadwal_vaksin/detail/") ?>" + x, true);
-                xmlhttp.send();
-
-            }
-            btnJadwalModal.forEach((elem, idx) => {
-                console.log(idx);
-                elem.onclick = () => {
-                    data = elem.getAttribute("data-id-vaksin");
-                    console.log(data);
-                    if (modalWrap !== null) {
-                        modalWrap.remove();
-                    };
-                    modalWrap = document.createElement("div");
-                    modalWrap.innerHTML = `
-                        <div class="modal modal-lg fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Detail jadwal</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div id="data">
-                                            <span>Loading..</span>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                    <button class="btn btn-info back" style="width: 90px;" type="submit">
-                                            Back
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        `
-                    document.body.append(modalWrap);
-                    let modal = new bootstrap.Modal(modalWrap.querySelector(".modal"));
-                    modal.show()
-                    showModal(data);
-                }
-            })
-        </script>
-    <?php } ?>
-    <script>
-        new DataTable("#example");
-    </script>
-    <script src="<?php echo base_url("assets/js/kabupaten.js") ?>"></script>
 
     <?php if ($page && $page == "Admin/provinsi/data_kabupaten.php") { ?>
         <script>
@@ -478,6 +278,80 @@
                     elem.appendChild(option);
                 })
             });
+            // console.log(kabupaten)
+        </script>
+    <?php } ?>
+    <?php if ($page && $page == "Admin/provinsi/laporan.php") { ?>
+        <script>
+            const selectKabupaten2 = document.getElementById("kabupaten");
+            const tanggal = document.getElementById("tanggal");
+            const formLaporan = document.getElementById("form-laporan");
+            formLaporan.onsubmit = (e) => {
+                e.preventDefault();
+                let http = new XMLHttpRequest();
+                let myObj = {};
+                const formData = new FormData(formLaporan);
+                formData.forEach((value, key) => myObj[key] = value);
+                console.log(myObj);
+                let url = `<?php echo base_url("admin_prov/laporan_detail") ?>?kabupaten=${myObj.kabupaten}&from=${myObj["tanggal-from"]}&to=${myObj["tanggal-to"]}`;
+                http.onreadystatechange = function() { //Call a function when the state changes.
+                    if (http.readyState == 4 && http.status == 200) {
+                        let a = JSON.parse(this.responseText);
+                        console.log(a);
+                        const parent = document.getElementById("table-laporan");
+                        parent.innerHTML =
+                            `
+                            <h4 class="mb-2">Hasil</h4>
+                            <div class="table-parent data mt-1">
+                                <table id="example" class="table table-striped" style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Peternak</th>
+                                            <th style="text-align:start" scope="col">No. HP</th>
+                                            <th scope="col">Jenis vaksin</th>
+                                            <th scope="col">Alamat</th>
+                                            <th scope="col">Tanggal pemberian</th>
+                                            <th scope="col">Jumlah dosis</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${a.data.map((x, idx) => {
+                                            return (
+                                                `
+                                                    <tr>
+                                                        <td>${x.nama_pemilik}</td>
+                                                        <td style="text-align:start">${x.no_hp}</td>
+                                                        <td>${x.jenis}</td>
+                                                        <td>${x.alamat}</td>
+                                                        <td>${x.tgl_pemberian}</td>
+                                                        <td>${x.jumlah_dosis}</td>
+                                                        <td style="text-align: end;">
+                                                            <button data-id-jadwal="${x.id_jadwal}" class="btn btn-download btn-primary btn-sm me-4">Download</button>
+                                                        </td>
+                                                    </tr>
+                                                `
+                                            )
+                                        }).join("")}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `
+                        new DataTable("#example");
+
+                        // alert("EDIT BERHASIL");
+                        document.querySelectorAll(".btn-download").forEach((elem, idx) => {
+                            const id_jadwal = elem.getAttribute("data-id-jadwal");
+                            elem.onclick = () => {
+                                console.log(id_jadwal)
+                            }
+                        })
+                    }
+                }
+                http.open('GET', url, true);
+                //Send the proper header information along with the request
+                http.send();
+            }
             // console.log(kabupaten)
         </script>
     <?php } ?>

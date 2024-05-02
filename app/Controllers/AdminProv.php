@@ -2,7 +2,9 @@
 
 namespace App\Controllers;
 
+use App\Models\DokumentasiModel;
 use App\Models\KabupatenModel;
+use App\Models\VaksinModel;
 
 class AdminProv extends BaseController
 {
@@ -156,5 +158,51 @@ class AdminProv extends BaseController
             );
         }
         return redirect()->to("admin_prov/data_kabupaten");
+    }
+    public function laporan()
+    {
+        $kabupatenModel = new KabupatenModel;
+        $data = array(
+            "page" => "Admin/provinsi/laporan.php",
+            "kabupaten" => $kabupatenModel->findAll()
+        );
+        return view("container", $data);
+    }
+    public function laporan_detail()
+    {
+        $vaksinModel = new VaksinModel;
+        // $jadwal = $this->request->getPost("jadwal");
+        $id_kab = $this->request->getVar("kabupaten");
+        $dari = $this->request->getVar("from");
+        $sampai = $this->request->getVar("to");
+        $data = "";
+        $data = $vaksinModel->join(
+            "pemilik_ternak",
+            "pemilik_ternak.id_pemilik_ternak = vaksinasi.id_peternak",
+            "left"
+        )->join(
+            "jadwal_vaksin",
+            "jadwal_vaksin.id_vaksin = vaksinasi.id_vaksinasi",
+            "left"
+        )->whereIn(
+            "vaksinasi.id_vaksinasi",
+            db_connect()->table(
+                "jadwal_vaksin"
+            )->select("id_vaksin")
+        )
+            ->where(
+                "pemilik_ternak.id_kab",
+                $id_kab
+            )->where(
+                "jadwal_vaksin.tgl_pemberian >=",
+                $dari
+            )->where(
+                "jadwal_vaksin.tgl_pemberian <=",
+                $sampai
+            )->findAll();
+
+
+        // return;
+        return $this->response->setStatusCode(200)->setJSON(array("data" => $data));
     }
 }

@@ -1,15 +1,14 @@
 <header>
-    <div class="my-container">
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="title">
-                <h5>
-                    Sistem informasi monitoring penjadwalan vaksinasi hewan
-                </h5>
-            </div>
+    <div class="my-container h-100 position-relative">
+        <div class="d-flex justify-content-between h-100">
+            <h5>
+                Sistem informasi <br> Monitoring penjadwalan vaksinasi hewan
+            </h5>
             <div class="account">
-                <span>Admin Kabupaten</span>
-                <img src="<?php echo base_url("assets/image/person-fill.svg")?>" width="37px">
+                <img src="<?php echo base_url("assets/image/location-pin.svg") ?>" width="19.5px">
+                <span><?php echo session()->get("user")["nama_kabupaten"] ?></span>
             </div>
         </div>
+        <?php include("sidebar.php") ?>
     </div>
 </header>

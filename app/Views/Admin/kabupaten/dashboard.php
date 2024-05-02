@@ -1,5 +1,4 @@
 <div class="content-parent">
-    <?php include("sidebar.php") ?>
     <div class="content">
         <?php include("header.php") ?>
         <div class="mt-4">
@@ -12,3 +11,4 @@
         </div>
     </div>
 </div>
+<?php include("dropdown_nav.php")?>
