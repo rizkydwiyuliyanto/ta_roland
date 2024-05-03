@@ -219,7 +219,6 @@ body {
 }
 .content-parent .content .data-jadwal {
   position: relative;
-  max-width: 350px;
   padding: 12px 14px;
   border-left: 3.2px solid var(--headerBG);
   transform: scale(1);

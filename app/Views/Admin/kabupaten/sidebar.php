@@ -20,9 +20,14 @@
                         Peternak
                     </a>
                 </li>
+                <li class="container">
+                    <a class="<?php echo $page && $page == "admin/kabupaten/jadwal_vaksin.php" ? "active" : "" ?>" href=" <?php echo base_url("admin_kab/jadwal_vaksin") ?>">
+                        Jadwal vaksin
+                    </a>
+                </li>
                 <li style="width:fit-content;" class="container dropdown-nav-parent">
                     <div style="width:fit-content;" class="d-flex justify-content-start align-items-center">
-                        <span class="me-4 <?php echo $page && str_contains($page, "peserta") ? "active":""?>">
+                        <span class="me-4 <?php echo $page && str_contains($page, "peserta") ? "active" : "" ?>">
                             Peserta
                         </span>
                         <img src="<?php echo base_url("assets/image/up-arrow.svg") ?>" width="19px">
@@ -37,11 +42,6 @@
                             </span>
                         </div>
                     </div>
-                </li>
-                <li class="container">
-                    <a class="<?php echo $page && $page == "admin/kabupaten/jadwal_vaksin.php" ? "active" : "" ?>" href=" <?php echo base_url("admin_kab/jadwal_vaksin") ?>">
-                        Jadwal vaksin
-                    </a>
                 </li>
                 <!-- <li class="container">
                     <a class="<?php echo $page && $page == "Admin/kabupaten/data_peternak.php" ? "active" : "" ?>" href=" <?php echo base_url("admin_kab/data_peternak") ?>">

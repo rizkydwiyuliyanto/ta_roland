@@ -33,7 +33,7 @@
                                             <td style="text-align:start"><?php echo $x["jenis_vaksin"] ?></td>
                                             <td style="text-align:start"><?php echo $x["tgl_vaksin"] ?></td>
                                             <td style="text-align: end;">
-                                                <button data-id-peserta="<?php echo $x["id"] ?>" class="btn btn-info btn-sm button-detail">
+                                                <button data-id-peserta="<?php echo $x["id_peserta"] ?>" class="btn btn-info btn-sm button-detail">
                                                     Detail
                                                 </button>
                                             </td>
@@ -62,6 +62,7 @@
     btnDetail.forEach(elem => {
         const idPeserta = elem.getAttribute("data-id-peserta");
         elem.onclick = () => {
+            console.log(idPeserta)
             if (modalWrap !== null) {
                 modalWrap.remove();
             };
@@ -97,13 +98,16 @@
             xmlhttp.onreadystatechange = function() {
                 if (this.readyState === 4 && this.status === 200) {
                     const a = JSON.parse(this.responseText);
+                    console.log(a)
                     let page = {
                         "detail": "",
                         "edit": "",
-                        "hapus": ""
+                        "hapus": "",
+                        "previousPage": ""
                     }
                     let previousPage = "";
-                    const setDetailPage = (a, page, previousPage) => {
+
+                    const setDetailPage = (a, page) => {
                         const createColumn = (id, label) => {
                             return {
                                 id: id,
@@ -139,35 +143,37 @@
                                 <button class="btn btn-danger btn-sm" id="btn-hapus">Hapus peserta</button>
                             </div>
                         `
-                        previousPage = page.detail;
                         console.log(previousPage)
                         document.getElementById("data").innerHTML = page.detail;
+                        page.previousPage = page.detail;
                     }
-                    setDetailPage(a, page, previousPage);
-                    console.log(previousPage)
-                    // console.log(a);
-                    const setHapusPage = (page, previousPage) => {
+                    setDetailPage(a, page);
+                    const setHapusPage = (a, page) => {
                         if (page.hapus === "") {
                             page.hapus = `
-                                <div class="d-flex flex-column">
+                                <div class="d-flex align-items-center">
                                     <span>Hapus peserta vaksin?</span>
-                                    <div class="d-flex">
-                                        <button class="btn me-4 btn-danger btn-sm">Tidak</button>
-                                        <button class="btn btn-primary btn-sm">Iya</button>
+                                    <div class="d-flex ms-auto">
+                                        <button class="btn me-2 btn-danger btn-sm">Tidak</button>
+                                        <button class="btn btn-primary btn-sm" id="submit-hapus">Iya</button>
                                     </div>
                                 </div>
+
                             `
                         };
                         document.getElementById("data").innerHTML = page.hapus;
+                        document.getElementById("submit-hapus").onclick = () => {
+                            window.location.href = "<?php echo base_url("admin_kab/delete_peserta/")?>"+idPeserta;
+                        }
                     };
 
                     document.getElementById("btn-hapus").onclick = () => {
-                        setHapusPage(page, previousPage)
+                        setHapusPage(a, page)
                     };
                     document.getElementById("back").onclick = () => {
-                        document.getElementById("data").innerHTML = previousPage;
+                        document.getElementById("data").innerHTML = page.previousPage;
                         document.getElementById("btn-hapus").onclick = () => {
-                            setHapusPage(page, previousPage)
+                            setHapusPage(a, page)
                         };
                     };
                 }

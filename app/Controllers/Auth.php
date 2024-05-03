@@ -89,4 +89,9 @@ class Auth extends BaseController
             return redirect()->to("login");
         }
     }
+    public function clear_login()
+    {
+        session()->destroy();
+        return redirect()->to("login");
+    }
 }

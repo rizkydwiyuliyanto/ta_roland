@@ -9,12 +9,12 @@
                     </h4>
                 </div>
                 <?php echo session()->getFlashdata("message") ?>
-                <div>
+                <div class="grid-parent">
                     <?php foreach ($data_jadwal_vaksin as $x) : ?>
-                        <div data-id-nama-vaksin="<?php echo $x["jenis_vaksin"] ?>" data-id-vaksin="<?php echo $x["id_jenis_vaksin"] ?>" class="d-flex justify-content-between align-items-center data-jadwal mb-4 boxShadow">
+                        <div data-id-nama-vaksin="<?php echo $x["jenis_vaksin"] ?>" data-id-vaksin="<?php echo $x["id"] ?>" class="d-flex justify-content-between align-items-center data-jadwal mb-4 boxShadow">
                             <div>
                                 <h4 class="p-0 m-0">
-                                    Vaksin <?php echo $x["jenis_vaksin"] ?>
+                                    <?php echo $x["jenis_vaksin"] ?>
                                 </h4>
                             </div>
                             <img src="<?php echo base_url("assets/image/schedule-add.svg") ?>" alt="schedule-add">

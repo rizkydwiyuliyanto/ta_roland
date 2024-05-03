@@ -3,12 +3,13 @@
         <?php include("header.php") ?>
         <div class="mt-4">
             <div class="my-container">
-                <h2>
-                    Hello world
-                </h2>
+                <h4>
+                    Dashboard
+                </h4>
             </div>
 
         </div>
+        <?php include("footer.php") ?>
     </div>
 </div>
-<?php include("dropdown_nav.php")?>
+<?php include("dropdown_nav.php") ?>

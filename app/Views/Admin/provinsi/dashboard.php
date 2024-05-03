@@ -1,14 +1,15 @@
 <div class="content-parent">
-    <?php include("sidebar.php") ?>
     <div class="content">
         <?php include("header.php") ?>
         <div class="mt-4">
             <div class="my-container">
-                <h2>
+                <h4>
                     Dashboard
-                </h2>
+                </h4>
             </div>
 
         </div>
+        <?php include("footer.php") ?>
     </div>
 </div>
+<?php include("dropdown_nav.php") ?>

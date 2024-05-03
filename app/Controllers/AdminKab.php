@@ -382,38 +382,47 @@ class AdminKab extends BaseController
     }
     public function data_dokumentasi()
     {
-        $jenisVaksinModel = new JenisVaksinModel;
-        $dataJadwalVaksin = "";
+        $pesertaModel = new PesertaModel;
         $id_kab = session()->get("user")["id"];
-        $dataJadwalVaksin = $jenisVaksinModel->join(
-            "pemilik_ternak",
-            "pemilik_ternak.nik = vaksinasi.id_peternak",
-            "left"
-        )->join(
-            "jadwal_vaksin",
-            "jadwal_vaksin.id_vaksin = vaksinasi.id_vaksinasi",
-            "left"
-        )->whereIn(
-            "vaksinasi.id_vaksinasi",
-            db_connect()->table(
-                "jadwal_vaksin"
-            )->select("id_vaksin")
-        )
-            ->where(
+        $data = array(
+            "data_peserta" => $pesertaModel->select(
+                "
+                    peserta_vaksin.id AS id_peserta,
+                    peserta_vaksin.nik,
+                    peserta_vaksin.id_jadwal,
+                    pemilik_ternak.alamat,
+                    pemilik_ternak.no_hp,
+                    pemilik_ternak.nama_pemilik,
+                    pemilik_ternak.jumlah_ternak,
+                    jadwal_vaksin.id_jenis_vaksin,
+                    jadwal_vaksin.hari_vaksin,
+                    jadwal_vaksin.tgl_vaksin,
+                    jenis_vaksin.jenis_vaksin
+                "
+            )->join(
+                "pemilik_ternak",
+                "pemilik_ternak.nik=peserta_vaksin.nik",
+                "left"
+            )->join(
+                "jadwal_vaksin",
+                "jadwal_vaksin.id_jadwal=peserta_vaksin.id_jadwal",
+                "left"
+            )->join(
+                "jenis_vaksin",
+                "jenis_vaksin.id=jadwal_vaksin.id_jenis_vaksin",
+                "left"
+            )->where(
                 "pemilik_ternak.id_kab",
                 $id_kab
-            )->findAll();
-
-        $data = array(
-            "page" => "Admin/kabupaten/data_dokumentasi.php",
-            "data_dokumentasi" => $dataJadwalVaksin
+            )->findAll(),
+            "page" => "Admin/kabupaten/data_dokumentasi.php"
         );
         return view("container", $data);
     }
-    public function data_dokumentasi_detail($id_jadwal)
+    public function data_dokumentasi_detail($idPeserta)
     {
         $dokumentasiModel = new DokumentasiModel;
-        $data["data"] = $dokumentasiModel->where("id_jadwal", $id_jadwal)->findAll();
+        $data["data"] = $dokumentasiModel->where("id_peserta", $idPeserta)->findAll();
         return $this->response->setStatusCode(200)->setJSON($data);
     }
     public function add_dokumentasi()
@@ -477,6 +486,77 @@ class AdminKab extends BaseController
                 return redirect("admin_kab/data_dokumentasi");
             }
         }
+    }
+    public function add_dokumentasi2($idPeserta)
+    {
+        $dokumentasiModel = new DokumentasiModel;
+        $validationRule = [
+            'foto' => [
+                'label' => 'Image File',
+                'rules' => [
+                    'uploaded[foto]',
+                    'is_image[foto]',
+                    'mime_in[foto,image/jpg,image/jpeg,image/gif,image/png,image/webp]'
+                ],
+            ],
+        ];
+        if (!$this->validate($validationRule)) {
+            // $arr = array();
+            // foreach ($errors as $e) :
+            //     array_push($arr, $this->notValidMessage($e));
+            // endforeach;
+            // $str = implode("", $arr);
+            // session()->setFlashdata(
+            //     "message",
+            //     $str
+            // );
+            $error = ['errors' => $this->validator->getErrors()];
+            $status = "";
+            session()->setFlashdata(
+                "message",
+                '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span style="margin-right: 6px;">Failed</span> :(
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>'
+            );
+            $status = array(
+                "success" => false
+            );
+            return redirect()->to("admin_kab/data_dokumentasi");
+        } else {
+            $img = $this->request->getFile("foto");
+            if (!$img->hasMoved()) {
+                $imgName = $img->getName();
+                $img->move("../public/uploads/jadwal/images/" . $idPeserta . "/", $imgName);
+                $filepath = base_url() . "uploads/jadwal/images/" . $idPeserta . "/" . $imgName;
+                $data = array(
+                    "id_peserta" => $idPeserta,
+                    "foto" => $filepath,
+                    "hari" => $this->request->getPost("hari"),
+                    "tanggal" => $this->request->getPost("tanggal"),
+                    "alamat" => $this->request->getPost("alamat"),
+                    "keterangan" => $this->request->getPost("keterangan"),
+                );
+                $dokumentasiModel->insert($data);
+                session()->setFlashdata(
+                    "message",
+                    '<div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span style="margin-right: 6px;">Success</span> :)
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>'
+                );
+                $status = array(
+                    "success" => true
+                );
+            }
+        }
+        return $this->response->setJSON($status);
+    }
+    public function dokumentasi_items($idPeserta)
+    {
+        $dokumentasiModel = new DokumentasiModel;
+        $data = $dokumentasiModel->where("id_peserta", $idPeserta)->findAll();
+        return $this->response->setStatusCode(200)->setJSON(array("data" => $data));
     }
     public function edit_dokumentasi($id_dokumentasi)
     {
@@ -659,8 +739,23 @@ class AdminKab extends BaseController
     public function data_peserta()
     {
         $pesertaModel = new PesertaModel;
+        $id_kab = session()->get("user")["id"];
         $data = array(
-            "data_peserta" => $pesertaModel->join(
+            "data_peserta" => $pesertaModel->select(
+                "
+                    peserta_vaksin.id AS id_peserta,
+                    peserta_vaksin.nik,
+                    peserta_vaksin.id_jadwal,
+                    pemilik_ternak.alamat,
+                    pemilik_ternak.no_hp,
+                    pemilik_ternak.nama_pemilik,
+                    pemilik_ternak.jumlah_ternak,
+                    jadwal_vaksin.id_jenis_vaksin,
+                    jadwal_vaksin.hari_vaksin,
+                    jadwal_vaksin.tgl_vaksin,
+                    jenis_vaksin.jenis_vaksin
+                "
+            )->join(
                 "pemilik_ternak",
                 "pemilik_ternak.nik=peserta_vaksin.nik",
                 "left"
@@ -672,10 +767,28 @@ class AdminKab extends BaseController
                 "jenis_vaksin",
                 "jenis_vaksin.id=jadwal_vaksin.id_jenis_vaksin",
                 "left"
+            )->where(
+                "pemilik_ternak.id_kab",
+                $id_kab
             )->findAll(),
             "page" => "Admin/kabupaten/data_peserta.php"
         );
         return view("container", $data);
+    }
+    public function delete_peserta($idPeserta)
+    {
+        $pesertaModel = new PesertaModel;
+        $pesertaModel->delete($idPeserta);
+        session()->setFlashdata(
+            "message",
+            '
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+               Success
+               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        '
+        );
+        return redirect()->to("admin_kab/data_peserta");
     }
     public function detail_peserta($idPeserta)
     {
@@ -702,13 +815,9 @@ class AdminKab extends BaseController
     }
     public function daftar_peserta()
     {
-        $jadwalVaksinModel = new JadwalVaksinModel;
+        $jadwalVaksinModel = new JenisVaksinModel;
         $data = array(
-            "data_jadwal_vaksin" => $jadwalVaksinModel->join(
-                "jenis_vaksin",
-                "jenis_vaksin.id=jadwal_vaksin.id_jenis_vaksin",
-                "left"
-            )->groupBy("jadwal_vaksin.id_jenis_vaksin")->findAll(),
+            "data_jadwal_vaksin" => $jadwalVaksinModel->findAll(),
             "page" => "Admin/kabupaten/daftar_peserta.php"
         );
         return view("container", $data);

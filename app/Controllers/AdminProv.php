@@ -2,7 +2,9 @@
 
 namespace App\Controllers;
 
+use App\Models\DistribusiVaksinModel;
 use App\Models\DokumentasiModel;
+use App\Models\JenisVaksinModel;
 use App\Models\KabupatenModel;
 use App\Models\VaksinModel;
 
@@ -168,6 +170,321 @@ class AdminProv extends BaseController
         );
         return view("container", $data);
     }
+    public function data_jenis_vaksin()
+    {
+        $jenisVaksinModel = new JenisVaksinModel;
+        $data = array(
+            "page" => "Admin/provinsi/jenis_vaksin.php",
+            "jenis_vaksin" => $jenisVaksinModel->findAll()
+        );
+        return view("container", $data);
+    }
+    public function add_jenis_vaksin()
+    {
+        $jenisVaksinModel = new JenisVaksinModel;
+        $validation = \Config\Services::validation();
+        $rules = [
+            'jenis_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Nama vaksin harus diisi.',
+                ],
+            ]
+        ];
+        $data = array(
+            "jenis_vaksin" => $this->request->getPost("jenis")
+        );
+        $validation->setRules($rules);
+        if ($validation->run($data)) {
+            $jenisVaksinModel->insert($data);
+            session()->setFlashdata(
+                "message",
+                '
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                   Success
+                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            '
+            );
+        } else {
+            $errors = $validation->getErrors();
+            $arr = array();
+            foreach ($errors as $e) :
+                array_push($arr, $this->notValidMessage($e));
+            endforeach;
+            $str = implode("", $arr);
+            session()->setFlashdata(
+                "message",
+                $str
+            );
+        }
+
+        return redirect()->to("admin_prov/data_jenis_vaksin");
+    }
+    public function delete_jenis_vaksin($idJenisVaksin)
+    {
+        $jenisVaksinModel = new JenisVaksinModel;
+        $jenisVaksinModel->delete($idJenisVaksin);
+        session()->setFlashdata(
+            "message",
+            '
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+               Success
+               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        '
+        );
+        return redirect()->to("admin_prov/data_jenis_vaksin");
+    }
+    public function detail_jenis_vaksin($idJenisVaksin)
+    {
+        $jenisVaksinModel = new JenisVaksinModel;
+        return $this->response->setStatusCode(200)->setJSON(array(
+            "detail" => $jenisVaksinModel->where("id", $idJenisVaksin)->first()
+        ));
+    }
+    public function edit_jenis_vaksin($idJenisVaksin)
+    {
+        $jenisVaksinModel = new JenisVaksinModel;
+        $validation = \Config\Services::validation();
+        $rules = [
+            'jenis_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Nama vaksin harus diisi.',
+                ],
+            ]
+        ];
+        $data = array(
+            "jenis_vaksin" => $this->request->getPost("jenis")
+        );
+        $validation->setRules($rules);
+        if ($validation->run($data)) {
+            $jenisVaksinModel->update($idJenisVaksin, $data);
+            session()->setFlashdata(
+                "message",
+                '
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                   Success
+                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            '
+            );
+        } else {
+            $errors = $validation->getErrors();
+            $arr = array();
+            foreach ($errors as $e) :
+                array_push($arr, $this->notValidMessage($e));
+            endforeach;
+            $str = implode("", $arr);
+            session()->setFlashdata(
+                "message",
+                $str
+            );
+        }
+        return redirect()->to("admin_prov/data_jenis_vaksin");
+    }
+    public function data_distribusi_vaksin()
+    {
+        $kabupatenModel = new KabupatenModel;
+        $jenisVaksinModel = new JenisVaksinModel;
+        $distribusiVaksinModel = new DistribusiVaksinModel;
+        $data = array(
+            "page" => "Admin/provinsi/distribusi_vaksin.php",
+            "jenis_vaksin" => $jenisVaksinModel->findAll(),
+            "kabupaten" => $kabupatenModel->findAll(),
+            "distribusi_vaksin" => $distribusiVaksinModel->select(
+                "
+                    distribusi_vaksin.id AS id_distribusi,
+                    distribusi_vaksin.id_kabupaten,
+                    distribusi_vaksin.id_jenis_vaksin,
+                    distribusi_vaksin.tahun_vaksin,
+                    distribusi_vaksin.jumlah_dosis,
+                    admin_kabupaten.nama_kabupaten,
+                    jenis_vaksin.jenis_vaksin
+                "
+            )->join(
+                "jenis_vaksin",
+                "jenis_vaksin.id = distribusi_vaksin.id_jenis_vaksin",
+                "left"
+            )->join(
+                "admin_kabupaten",
+                "admin_kabupaten.id_kab = distribusi_vaksin.id_kabupaten",
+                "left"
+            )->findAll()
+        );
+        return view("container", $data);
+    }
+
+    public function add_distribusi_vaksin()
+    {
+        $distribusiModel = new DistribusiVaksinModel;
+        $validation = \Config\Services::validation();
+        $rules = [
+            'id_jenis_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Nama vaksin harus diisi.',
+                ],
+            ],
+            'id_kabupaten' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Kabupaten harus diisi.',
+                ],
+            ],
+            'tahun_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Tahun vaksin harus diisi.',
+                ],
+            ],
+            'jumlah_dosis' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Jumlah dosis harus diisi.',
+                ],
+            ]
+        ];
+        $data = array(
+            "id_jenis_vaksin" => $this->request->getPost("jenis"),
+            "id_kabupaten" => $this->request->getPost("kabupaten"),
+            "tahun_vaksin" => $this->request->getPost("tahun_vaksin"),
+            "jumlah_dosis" => $this->request->getPost("jumlah_dosis")
+        );
+        $validation->setRules($rules);
+        if ($validation->run($data)) {
+            $distribusiModel->insert($data);
+            session()->setFlashdata(
+                "message",
+                '
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                   Success
+                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            '
+            );
+        } else {
+            $errors = $validation->getErrors();
+            $arr = array();
+            foreach ($errors as $e) :
+                array_push($arr, $this->notValidMessage($e));
+            endforeach;
+            $str = implode("", $arr);
+            session()->setFlashdata(
+                "message",
+                $str
+            );
+        };
+        return redirect()->to("admin_prov/data_distribusi_vaksin");
+    }
+    public function edit_distribusi_vaksin($idDistribusiVaksin)
+    {
+        $distribusiModel = new DistribusiVaksinModel;
+        $validation = \Config\Services::validation();
+        $rules = [
+            'id_jenis_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Nama vaksin harus diisi.',
+                ],
+            ],
+            'id_kabupaten' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Kabupaten harus diisi.',
+                ],
+            ],
+            'tahun_vaksin' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Tahun vaksin harus diisi.',
+                ],
+            ],
+            'jumlah_dosis' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Jumlah dosis harus diisi.',
+                ],
+            ]
+        ];
+        $data = array(
+            "id_jenis_vaksin" => $this->request->getPost("jenis"),
+            "id_kabupaten" => $this->request->getPost("kabupaten"),
+            "tahun_vaksin" => $this->request->getPost("tahun_vaksin"),
+            "jumlah_dosis" => $this->request->getPost("jumlah_dosis")
+        );
+        $validation->setRules($rules);
+        if ($validation->run($data)) {
+            $distribusiModel->update($idDistribusiVaksin, $data);
+            session()->setFlashdata(
+                "message",
+                '
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                   Success
+                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            '
+            );
+        } else {
+            $errors = $validation->getErrors();
+            $arr = array();
+            foreach ($errors as $e) :
+                array_push($arr, $this->notValidMessage($e));
+            endforeach;
+            $str = implode("", $arr);
+            session()->setFlashdata(
+                "message",
+                $str
+            );
+        };
+        return redirect()->to("admin_prov/data_distribusi_vaksin");
+    }
+    public function delete_distribusi_vaksin($idDistribusiVaksin)
+    {
+        $distribusiModel = new DistribusiVaksinModel;
+        $distribusiModel->delete($idDistribusiVaksin);
+        session()->setFlashdata(
+            "message",
+            '
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+               Success
+               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        '
+        );
+        return redirect()->to("admin_prov/data_distribusi_vaksin");
+    }
+    public function detail_distribusi_vaksin($idDistribusiVaksin)
+    {
+        $distribusiVaksinModel = new DistribusiVaksinModel;
+        $kabupatenModel = new KabupatenModel;
+        $jenisVaksinModel = new JenisVaksinModel;
+        return $this->response->setStatusCode(200)->setJSON(array(
+            "detail" => $distribusiVaksinModel->select(
+                "
+                    distribusi_vaksin.id AS id_distribusi,
+                    distribusi_vaksin.id_kabupaten,
+                    distribusi_vaksin.id_jenis_vaksin,
+                    distribusi_vaksin.tahun_vaksin,
+                    distribusi_vaksin.jumlah_dosis,
+                    admin_kabupaten.nama_kabupaten,
+                    jenis_vaksin.jenis_vaksin
+                "
+            )->join(
+                "jenis_vaksin",
+                "jenis_vaksin.id = distribusi_vaksin.id_jenis_vaksin",
+                "left"
+            )->join(
+                "admin_kabupaten",
+                "admin_kabupaten.id_kab = distribusi_vaksin.id_kabupaten",
+                "left"
+            )->where("distribusi_vaksin.id", $idDistribusiVaksin)->first(),
+            "jenis_vaksin" => $jenisVaksinModel->findAll(),
+            "kabupaten" => $kabupatenModel->findAll()
+        ));
+    }
+
     public function laporan_detail()
     {
         $vaksinModel = new VaksinModel;

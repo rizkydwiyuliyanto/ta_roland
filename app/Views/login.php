@@ -1,12 +1,12 @@
 <div class="d-flex justify-content-center">
     <?php echo session()->getFlashdata("message"); ?>
 </div>
-<div class="form-login d-flex flex-column justify-content-between">
-    <div class="header">
+<div class="form-login d-flex flex-column">
+    <div class="mb-2">
         <img src="<?php echo base_url("assets/image/logo.png") ?>" width="70px">
         <h5 class="fw-bold">Login</h5>
     </div>
-    <form class="form" method="post" action="<?php echo base_url("save_auth") ?>">
+    <form class="form m-0" method="post" action="<?php echo base_url("save_auth") ?>">
         <div class="col-12 d-flex flex-column">
             <div class="mb-2">
                 <div>
@@ -31,7 +31,7 @@
                     </option>
                 </select>
             </div>
-            <span style="margin-top:4px;margin-left:auto;font-size:14px;">Lupa password</span>
+            <span style="margin-top:4px;margin-left:auto;font-size:14px;" class="my-2">Lupa password</span>
             <div>
                 <button class="btn-submit">Login</button>
             </div>

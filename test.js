@@ -1,6 +1,9 @@
-const setNumber = (a) => {
-    a = 20;
+let test = {
+    "one": ""
 }
-let c = 0;
-setNumber(c);
-console.log(c)
+const setNumber = (a) => {
+    a.one = "20"
+}
+
+setNumber(test);
+console.log(test)

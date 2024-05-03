@@ -150,7 +150,13 @@
             </div>
 
         </div>
-        <?php include("footer.php")?>
+        <?php include("footer.php") ?>
     </div>
 </div>
-<?php include("dropdown_nav.php")?>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.0.2/js/dataTables.bootstrap5.js"></script>
+<?php include("dropdown_nav.php") ?>
+<script>
+    new DataTable("#example");
+</script>
