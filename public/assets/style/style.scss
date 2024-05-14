@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 :root {
     --sidebarBG: #e7e7e7;
@@ -16,6 +17,161 @@
 
 body {
     background-color: #EAEFF2;
+}
+
+.navbar {
+    height: 50px;
+    background-color: var(--headerBG);
+
+    h4 {
+        margin: 0;
+        // color: #E94B3C;
+        color: #F1F1F1;
+    }
+
+    a {
+        text-decoration: none;
+        color: #F1F1F1;
+    }
+}
+
+.banner {
+    height: calc(100vh - 50px);
+    width: 100%;
+    // background-color: #343148;
+    background-image: url("./../image/landingpage/bg-banner1.jpg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .banner-content {
+        display: flex;
+        height: 80%;
+        align-items: center;
+    }
+
+    #contact {
+        margin-left: auto;
+
+        // height: fit-content;
+        // height: 100%;
+        // border: 1px solid red;
+        .header-form {
+
+            // color:#222222;
+            h4 {
+                // font-family: "Open Sans";
+                text-align: center;
+            }
+        }
+
+        #form {
+            // height: 100%;
+            width: 520px;
+            float: left;
+            border-radius: 7px;
+            color: #F1F1F1;
+            background-color: var(--headerBG);
+            padding: 1.7em 2.2em;
+
+            .form-items {
+                display: flex;
+                justify-content: space-between;
+
+                input {
+                    font-family: "Open Sans";
+                    float: left;
+                    width: 320px;
+                    border: 0px;
+                    color: #222222;
+                    padding: 10px 10px 10px 30px;
+                    // font: 11px/20px'Open Sans', Verdana, Helvetica, sans-serif;
+                    margin-bottom: 10px;
+                    background-color: #F1F1F1;
+                }
+
+                textarea {
+                    float: left;
+                    border: 0px;
+                    width: 320px;
+                    height: 140px;
+                    padding: 10px 10px 10px 30px;
+                    // font: 11px/20px'Open Sans', Verdana, Helvetica, sans-serif;
+                    color: #222222;
+                    background-color: #F1F1F1;
+                    resize: none;
+                }
+
+                span {
+                    font-family: "Open Sans";
+                }
+            }
+
+            button.submit {
+                cursor: pointer;
+                width: 320px;
+                height: 37px;
+                background: none;
+                outline: none;
+                border: none;
+                margin-left: auto;
+                margin-top: 12px;
+                font-weight: bold;
+                font-family: "Open Sans";
+                font-size: 18px;
+                // font: 11px/20px'Open Sans', Verdana, Helvetica, sans-serif;
+                background-color: #ECDB54;
+                color: #222222;
+            }
+
+        }
+
+        // border: 1px solid rgb(242, 242, 242);
+    }
+
+
+
+}
+
+.distribusi-item {
+    cursor: pointer;
+    position: relative;
+
+    &::before {
+        content: "";
+        height: 2px;
+        background-color: var(--headerBG);
+        position: absolute;
+        bottom: -2px;
+        width: 0;
+        transition: width 0.2s 0s linear;
+    }
+
+    &:hover {
+        &::before {
+            width: 100%;
+        }
+    }
+
+    margin-bottom:12px;
+    width: fit-content;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+
+
+.grid-parent-dokumentasi-detail{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    // gap: 12px;
+    row-gap: 14px;
+    column-gap: 18px;
 }
 
 .grid-parent {
@@ -175,6 +331,7 @@ body {
                         display: flex;
                         flex-direction: column;
                         justify-content: space-between;
+
                         span {
                             cursor: pointer;
                         }
@@ -266,6 +423,7 @@ body {
             transition: transform 0.2s 0.1s ease-in;
             background-color: #F4F4F4;
             cursor: pointer;
+
             img {
                 // position: absolute;
                 width: 40px;
@@ -273,6 +431,7 @@ body {
                 // right: 14px;
                 // top: -12px;
             }
+
             &:hover {
                 transform: scale(1.05);
             }
@@ -285,4 +444,99 @@ body {
             padding: 1em 0;
         }
     }
+
+    .search {
+        position: relative;
+        box-shadow: 0 0 40px rgba(51, 51, 51, .1);
+
+        input {
+            height: 60px;
+            text-indent: 25px;
+            border: 2px solid #d6d4d4;
+
+            &:focus {
+                box-shadow: none;
+                border: 2px solid blue;
+            }
+        }
+
+        .fa-search {
+
+            position: absolute;
+            top: 20px;
+            left: 16px;
+
+        }
+
+        button {
+
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            height: 50px;
+            width: 110px;
+            background: blue;
+
+        }
+    }
+
+}
+#example {
+    font-size: 15px;
+}
+.dokumentasi-item {
+    opacity: 1;
+    transition: opacity 0.36s 0s ease-out;
+    // border: 2px solid red;
+}
+.card-radio {
+    width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+
+    .radio-label {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .box {
+        background: #ddd;
+        padding: 16px;
+        display: flex;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.25s ease;
+
+        &:hover {
+            background: #d5bbf7;
+        }
+
+        .circle {
+            height: 16px;
+            width: 16px;
+            background: #ccc;
+            border: 3.4px solid transparent;
+            display: inline-block;
+            margin-right: 9px;
+            border-radius: 50%;
+            transition: all 0.25s ease;
+            box-shadow: inset -4px -4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .plan {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            font-size: 17px;
+        }
+
+        .price {
+            font-size: 14px;
+        }
+
+    }
+
 }

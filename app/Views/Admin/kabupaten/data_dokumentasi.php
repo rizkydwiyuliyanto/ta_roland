@@ -1,31 +1,3 @@
-<!-- <div class="modal fade" id="addDokumentasi" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabel">Tambah data Dokumentasi</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <?= form_open_multipart("admin_kab/add_dokumentasi") ?>
-            <div class="modal-body">
-                <div style="background-color: #a5a5a5;width:100%;height:200px;" class="rounded position-relative d-flex align-items-center justify-content-center overflow-hidden mb-2">
-                    <span style="color:white;font-size:40px">+</span>
-                    <img class="preview-image" id="preview-image" alt="previewImage" style="display:none;position: absolute;width:100%;height:100%;object-fit:cover;">
-                    <input name="foto" style="position: absolute;height:100%;width:100%;opacity:0;" class="form-control" id="input-image" type="file" accept="image/*">
-                </div>
-                <div>
-                    <label for="keterangan" class="form-label">Keterangan</label>
-                    <textarea class="form-control" name="keterangan" id="keterangan" rows="2"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="btn-add" style="width: 170px;" type="submit">
-                    Submit
-                </button>
-            </div>
-            </form>
-        </div>
-    </div>
-</div> -->
 <div class="content-parent">
     <div class="content">
         <?php include("header.php") ?>
@@ -167,210 +139,292 @@
                 let a = JSON.parse(this.responseText);
                 console.log(a);
                 const setPageDetail = (page, idPeserta) => {
-                    page.detail = `
+                    var xmlhttp = new XMLHttpRequest;
+                    xmlhttp.onreadystatechange = function() {
+                        if (this.readyState === 4 && this.status === 200) {
+                            const a = JSON.parse(this.responseText);
+                            console.log(a);
+                            const createColumns = (id, label) => {
+                                return {
+                                    id: id,
+                                    label: label
+                                }
+                            }
+                            const columns = [
+                                createColumns("alamat", "Alamat"),
+                                createColumns("keterangan", "Keterangan"),
+                                createColumns("hari", "Hari"),
+                                createColumns("tanggal", "Tanggal"),
+                                // createColumns("alamat", "Alamat"),
+                            ]
+                            document.getElementById("data").innerHTML = `
                                 <div class="mb-2">
                                     <Button class="btn btn-primary btn-sm" id="tambah-dokumentasi">
                                         Tambah dokumentasi
                                     </Button>
                                 </div>
                                 <div class="d-flex flex-column">
-                                    <div id="data-items">
-
+                                    <div class="mt-4">
+                                        ${a.data.map((x, idx) => {
+                                            return (
+                                                `
+                                                    <div class="d-flex dokumentasi-item flex-md-row flex-column ${idx!==0?"mt-5":""} justify-content-between col-12">
+                                                        <div class="boxShadow col-12 col-md-4 rounded overflow-hidden" style="height:200px;">
+                                                            <img src="${x.foto}" style="width: 100%;height:100%;object-fit:cover;">
+                                                        </div>
+                                                        <div class="d-flex col-12 col-md-7 flex-column">
+                                                            <div class="mb-4 d-flex mt-md-0 mt-2">
+                                                                <button class="btn btn-info btn-edit btn-sm me-2" data-id-dokumentasi="${x.id_dokumentasi}">Edit</button>
+                                                                <div class="d-flex align-items-center col-10">
+                                                                    <button class="btn btn-danger btn-sm btn-delete-dokumentasi">Delete</button>
+                                                                    <div class="ms-auto form-delete align-items-center" data-id-dokumentasi="${x.id_dokumentasi}" style="display: none;">
+                                                                        <span class="me-2">Hapus dokumentasi ?</span>
+                                                                        <button class="btn btn-danger btn-sm me-2">Tidak</button>
+                                                                        <button class="btn btn-success btn-sm">Iya</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                ${columns.map((col) => {
+                                                                    return (
+                                                                        `
+                                                                            <div class="d-flex justify-content-between">
+                                                                                <span class="col-3">${col.label}</span>
+                                                                                <span class="col-9">: ${x[col.id]}</span>
+                                                                            </div>
+                                                                        `
+                                                                    )
+                                                                }).join("")}
+                                                                <span><span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    `
+                                                )
+                                            }).join("")}
                                     </div>
-
-                                </div>
-                            `
-                    document.getElementById("data").innerHTML = page.detail;
-                    page.previousPage = page.detail;
-                    var xmlhttp = new XMLHttpRequest;
-                    xmlhttp.onreadystatechange = function() {
-                        if (this.readyState === 4 && this.status === 200) {
-                            const a = JSON.parse(this.responseText);
-                            console.log(a);
-
-                            document.getElementById("data-items").innerHTML = `
-                                <div class="grid-parent mt-4">
-                                    ${a.data.map((x, idx) => {
-                                        return (
-                                            `
-                                                <div class="boxShadow rounded overflow-hidden" style="height:200px;">
-                                                    <img src="${x.foto}" style="width: 100%;height:100%;object-fit:cover;">
-                                                </div>
-                                            `
-                                        )
-                                    }).join("")}
                                 </div>
                             `;
+                            const setPageTambah = (page, idPeserta) => {
+                                console.log(idPeserta)
+                                const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
+                                page.tambahDokumentasi =
+                                    `
+                                        <form class="d-flex flex-column" id="form-submit">
+                                            <div class="d-flex col-12 justify-content-between flex-md-row flex-column">
+                                                <div style="background-color: #a5a5a5;height:250px;" class="rounded col-12 col-md-5 position-relative d-flex align-items-center justify-content-center overflow-hidden mb-2">
+                                                    <span style="color:white;font-size:40px">+</span>
+                                                    <img class="preview-image" id="preview-image" alt="previewImage" style="display:none;position: absolute;width:100%;height:100%;object-fit:cover;">
+                                                    <input name="foto" style="position: absolute;height:100%;width:100%;opacity:0;" class="form-control" id="input-image" type="file" accept="image/*">
+                                                </div>
+                                                <div class="col-12 d-flex flex-column col-md-6">
+                                                    <div class="mb-2">
+                                                        <label for="tanggal" class="form-label">Tanggal</label>
+                                                        <input type="date" class="form-control" name="tanggal" id="tanggal">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label for="hari" class="form-label">Hari</label>
+                                                        <select class="form-select" name="hari" id="hari">
+                                                            <option>Pilih hari</option>
+                                                            ${hari.map(x => {
+                                                                return (
+                                                                    `
+                                                                        <option value="${x}">${x}</option>
+                                                                    `
+                                                                )
+                                                            }).join("")}
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label for="alamat" class="form-label">Alamat</label>
+                                                        <textarea class="form-control" name="alamat" id="alamat" rows="2"></textarea>
+                                                    </div>
+                                                    <div class="mb-4">
+                                                        <label for="keterangan" class="form-label">Keterangan</label>
+                                                        <textarea class="form-control" name="keterangan" id="keterangan" rows="2"></textarea>
+                                                    </div>
+                                                    <div class="ms-auto">
+                                                        <button type="button" class="btn btn-primary btn-sm" id="btn-submit">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    `
+                                document.getElementById("data").innerHTML = page.tambahDokumentasi;
+                                fn_inputImage(
+                                    document.getElementById("input-image"),
+                                    document.getElementById("preview-image")
+                                );
+                                const formSubmit = document.getElementById("form-submit");
+                                document.getElementById("btn-submit").onclick = () => {
+                                    const formData = new FormData(formSubmit);
+                                    fetch("<?php echo base_url("admin_kab/add_dokumentasi2/") ?>" + idPeserta, {
+                                        method: "post",
+                                        body: formData
+                                    }).then(response => {
+                                        response.json().then(e => {
+                                            if (e.success) {
+                                                setPageDetail(page, idPeserta);
+                                            };
+                                        })
+                                    }).catch(err => {
+                                        console.log(err);
+                                    });
+                                }
+                            }
+                            const tambahDokumentasi = document.getElementById("tambah-dokumentasi");
+                            tambahDokumentasi.onclick = () => {
+                                setPageTambah(page, idPeserta);
+                            };
+                            const btnDeleteDokumentasi = document.querySelectorAll(".btn-delete-dokumentasi");
+                            btnDeleteDokumentasi.forEach((elem, idx) => {
+                                const idDokumentasi = elem.getAttribute("data-id-dokumentasi");
+                                elem.onclick = () => {
+                                    for (let i = 0; i < formDelete.length; i++) {
+                                        const formDeleteElem = formDelete[i];
+                                        if (idx === i) {
+                                            formDeleteElem.style.display = "flex"
+                                        } else {
+                                            formDeleteElem.style.display = "none"
+                                        }
+                                    }
+                                }
+                            });
+                            const formDelete = document.querySelectorAll(".form-delete");
+                            formDelete.forEach((elem, idx) => {
+                                const close = elem.children["1"];
+                                const submitDelete = elem.lastElementChild;
+                                const idDokumentasi = elem.getAttribute("data-id-dokumentasi");
+                                close.onclick = () => {
+                                    elem.style.display = "none";
+                                    console.log("Close")
+                                }
+                                submitDelete.onclick = () => {
+                                    fetch(
+                                        `<?php echo base_url("admin_kab/delete_dokumentasi/") ?>${idDokumentasi}`, {
+                                            method: "delete"
+                                        }
+                                    ).then(response => {
+                                        response.json().then(e => {
+                                            if (e.success) {
+                                                document.querySelectorAll(".dokumentasi-item")[idx].style.opacity = "0";
+                                                let timeOut = setTimeout(() => {
+                                                    setPageDetail(page, idPeserta);
+                                                }, 400);
+                                            }
+                                        })
+                                    })
+                                }
+                            })
+                            const btnEditDokumentasi = document.querySelectorAll(".btn-edit");
+                            btnEditDokumentasi.forEach(elem => {
+                                const idDokumentasi = elem.getAttribute("data-id-dokumentasi");
+                                elem.onclick = () => {
+                                    var xmlhttp = new XMLHttpRequest;
+                                    xmlhttp.onreadystatechange = function() {
+                                        if (this.readyState === 4 && this.status === 200) {
+                                            const a = JSON.parse(this.responseText);
+                                            console.log(a);
+                                            const {
+                                                alamat,
+                                                foto,
+                                                hari,
+                                                id_dokumentasi,
+                                                id_peserta,
+                                                keterangan,
+                                                tanggal
+                                            } = a.detail;
+                                            const haris = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
+                                            document.getElementById("data").innerHTML =
+                                                `
+                                                    <form class="d-flex flex-column" id="form-submit-edit">
+                                                        <div class="d-flex col-12 justify-content-between flex-md-row flex-column">
+                                                            <div style="background-color: #a5a5a5;height:250px;" class="rounded col-12 col-md-5 position-relative d-flex align-items-center justify-content-center overflow-hidden mb-2">
+                                                                <span style="color:white;font-size:40px">+</span>
+                                                                <img class="preview-image" id="preview-image-edit" alt="previewImage" style="position: absolute;width:100%;height:100%;object-fit:cover;" src="${foto}">
+                                                                <input name="foto" style="position: absolute;height:100%;width:100%;opacity:0;" class="form-control" id="input-image-edit" type="file" accept="image/*">
+                                                            </div>
+                                                            <div class="col-12 d-flex flex-column col-md-6">
+                                                                <div class="mb-2">
+                                                                    <label for="tanggal" class="form-label">Tanggal</label>
+                                                                    <input type="date" class="form-control" name="tanggal" id="tanggal" value="${tanggal}">
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label for="hari" class="form-label">Hari</label>
+                                                                    <select class="form-select" name="hari" id="hari">
+                                                                        <option>Pilih hari</option>
+                                                                        ${haris.map(x => {
+                                                                            return (
+                                                                                `
+                                                                                    <option ${hari === x ? "selected" : ""} value="${x}">${x}</option>
+                                                                                `
+                                                                            )
+                                                                        }).join("")}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label for="alamat" class="form-label">Alamat</label>
+                                                                    <textarea class="form-control" name="alamat" id="alamat" rows="2">${alamat}</textarea>
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label for="keterangan" class="form-label">Keterangan</label>
+                                                                    <textarea class="form-control" name="keterangan" id="keterangan" rows="2">${keterangan}</textarea>
+                                                                </div>
+                                                                <div class="ms-auto">
+                                                                    <button type="button" class="btn btn-primary btn-sm" id="btn-submit-edit">
+                                                                        Submit
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                `
+                                            fn_inputImage(
+                                                document.getElementById("input-image-edit"),
+                                                document.getElementById("preview-image-edit")
+                                            );
+                                            const formSubmit = document.getElementById("form-submit-edit");
+                                            document.getElementById("btn-submit-edit").onclick = () => {
+                                                const formData = new FormData(formSubmit);
+                                                console.log(formData)
+                                                fetch("<?php echo base_url("admin_kab/edit_dokumentasi/") ?>" + idDokumentasi, {
+                                                    method: "post",
+                                                    body: formData
+                                                }).then(response => {
+                                                    response.json().then(e => {
+                                                        if (e.success) {
+                                                            console.log("SUCcess")
+                                                            setPageDetail(page, idPeserta);
+                                                        };
+                                                    })
+                                                }).catch(err => {
+                                                    console.log(err);
+                                                });
+                                            }
+                                        }
+                                    }
+                                    xmlhttp.open("get", "<?php echo base_url("admin_kab/detail_dokumentasi/") ?>" + idDokumentasi);
+                                    xmlhttp.send();
+                                };
+                            })
                         }
                     }
                     xmlhttp.open("get", "<?php echo base_url("admin_kab/dokumentasi_items/") ?>" + idPeserta)
                     xmlhttp.send()
                 }
                 setPageDetail(page, x);
-                const tambahDokumentasi = document.getElementById("tambah-dokumentasi");
-                const btnEditDokumentasi = document.querySelectorAll(".btn-edit-dokumentasi");
-                const btnDeleteDokumentasi = document.querySelectorAll(".btn-delete-dokumentasi");
-                const backBtnDokumentasi = document.querySelectorAll(".btn-back-dokumentasi")
+                const backBtnDokumentasi = document.querySelectorAll(".btn-back-dokumentasi");
                 // console.log(backBtnDokumentasi)
-                const setPageTambah = (page, idPeserta) => {
-                    console.log(idPeserta)
-                    const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
-                    page.tambahDokumentasi =
-                        `
-                        <form class="d-flex flex-column" id="form-submit">
-                            <div style="background-color: #a5a5a5;width:100%;height:200px;" class="rounded position-relative d-flex align-items-center justify-content-center overflow-hidden mb-2">
-                                <span style="color:white;font-size:40px">+</span>
-                                <img class="preview-image" id="preview-image" alt="previewImage" style="display:none;position: absolute;width:100%;height:100%;object-fit:cover;">
-                                <input name="foto" style="position: absolute;height:100%;width:100%;opacity:0;" class="form-control" id="input-image" type="file" accept="image/*">
-                            </div>
-                            <div class="mb-2">
-                                <label for="tanggal" class="form-label">Tanggal</label>
-                                <input type="date" class="form-control" name="tanggal" id="tanggal">
-                            </div>
-                            <div class="mb-2">
-                                <label for="hari" class="form-label">Hari</label>
-                                <select class="form-select" name="hari" id="hari">
-                                    <option>Pilih hari</option>
-                                    ${hari.map(x => {
-                                        return (
-                                            `
-                                                <option value="${x}">${x}</option>
-                                            `
-                                        )
-                                    }).join("")}
-                                </select>
-                            </div>
-                            <div class="mb-2">
-                                <label for="alamat" class="form-label">Alamat</label>
-                                <textarea class="form-control" name="alamat" id="alamat" rows="2"></textarea>
-                            </div>
-                            <div class="mb-4">
-                                <label for="keterangan" class="form-label">Keterangan</label>
-                                <textarea class="form-control" name="keterangan" id="keterangan" rows="2"></textarea>
-                            </div>
-                            <div class="ms-auto">
-                                <button type="button" class="btn btn-primary btn-sm" id="btn-submit">
-                                    Submit
-                                </button>
-                            </div>
-                        </form>
-                    `
-                    document.getElementById("data").innerHTML = page.tambahDokumentasi;
-                    fn_inputImage(
-                        document.getElementById("input-image"),
-                        document.getElementById("preview-image")
-                    );
-                    const formSubmit = document.getElementById("form-submit");
-                    document.getElementById("btn-submit").onclick = () => {
-                        const formData = new FormData(formSubmit);
-                        const inputImage = document.getElementById("input-image");
-                        fetch("<?php echo base_url("admin_kab/add_dokumentasi2/") ?>" + idPeserta, {
-                            method: "post",
-                            body: formData
-                        }).then(response => {
-                            response.json().then(e => {
-                                if (e.success) {
-                                    setPageDetail(page, x);
-                                    const tambahDokumentasi = document.getElementById("tambah-dokumentasi");
-                                    tambahDokumentasi.onclick = () => {
-                                        setPageTambah(page, x);
-                                    };
-                                    // window.location.href = "<?php echo base_url("admin_kab/data_kabupaten") ?>"
-                                };
-                                console.log(e);
-                            })
-                        }).catch(err => {
-                            console.log(err);
-                        });
-                    }
-                }
-                tambahDokumentasi.onclick = () => {
-                    setPageTambah(page, x);
-                };
+
                 backBtnDokumentasi.forEach((elem, idx) => {
                     elem.onclick = () => {
                         setPageDetail(page, x);
-                        const tambahDokumentasi = document.getElementById("tambah-dokumentasi");
-                        tambahDokumentasi.onclick = () => {
-                            setPageTambah(page, x);
-                        };
                         // showModalDokumentasi(data2);
                         // modalWrap.remove();
                     }
-                })
-                btnDeleteDokumentasi.forEach((elem, idx) => {
-                    const idDokumentasi = elem.getAttribute("data-id-dokumentasi");
-                    const foto = elem.getAttribute("data-foto");
-                    elem.onclick = () => {
-                        // window.location.href = "<?php echo base_url("admin_kab/delete_dokumentasi/") ?>" + idDokumentasi;
-                        idx2 = 2;
-                        body2[idx2].content = `
-                                <div style="background-color: #a5a5a5;width:100%;height:200px;" class="rounded position-relative d-flex align-items-center justify-content-center overflow-hidden mb-2">
-                                                <span style="color:white;font-size:40px">+</span>
-                                                <img src="${foto}" class="preview-image" id="preview-image2" alt="previewImage" style="display:block;position: absolute;width:100%;height:100%;object-fit:cover;">
-                                                <input name="foto" style="position: absolute;height:100%;width:100%;opacity:0;" class="form-control" id="input-image2" type="file" accept="image/*">
-                                </div>
-                                `
-                        document.getElementById("data").innerHTML = body2[idx2].content;
-                    }
-                })
-                btnEditDokumentasi.forEach((elem, idx) => {
-                    const idDokumentasi = elem.getAttribute("data-id-dokumentasi");
-                    const text = elem.getAttribute("data-text");
-                    const foto = elem.getAttribute("data-foto");
-                    elem.onclick = () => {
-                        idx2 = 1;
-                        body2[idx2].content = `
-                                <form method="post" id="form-dokumentasi" action="<?php echo base_url("admin_kab/edit_dokumentasi/") ?>${idDokumentasi}" enctype="multipart/form-data">
-                                        <input type="hidden" name="_method" value="PUT">
-                                        <div class="modal-body">
-                                            <div class="mb-4">
-                                                <span></span>
-                                            </div>
-                                            <div style="background-color: #a5a5a5;width:100%;height:200px;" class="rounded position-relative d-flex align-items-center justify-content-center overflow-hidden mb-2">
-                                                <span style="color:white;font-size:40px">+</span>
-                                                <img src="${foto}" class="preview-image" id="preview-image2" alt="previewImage" style="display:block;position: absolute;width:100%;height:100%;object-fit:cover;">
-                                                <input name="foto" style="position: absolute;height:100%;width:100%;opacity:0;" class="form-control" id="input-image2" type="file" accept="image/*">
-                                            </div>
-                                            <div>
-                                                <label for="keterangan" class="form-label">Keterangan</label>
-                                                <textarea class="form-control" name="keterangan" id="keterangan" rows="2">${text}</textarea>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button class="btn btn-primary" id="btn-edit-dokumentasi" style="width: 170px;" type="submit">
-                                                Submit
-                                            </button>
-                                        </div>
-                                    </form>
-                                `
-                        document.getElementById("data").innerHTML = body2[idx2].content;
-                        // document.getElementById("form-dokumentasi").onsubmit = (e) => {
-                        //     e.preventDefault();
-                        // }
-                        document.getElementById("btn-edit-dokumentasi").onclick = () => {
-                            const formData = new FormData(document.getElementById("form-dokumentasi"));
-                            // let formData2 = new FormData();
-                            // formData2.append("keterangan", "FFIIKSKS");
-                            // // console.log(formData);
-                            // fetch(`<?php echo base_url("admin_kab/edit_dokumentasi/") ?>${idDokumentasi}`, {
-                            //     body: formData2,
-                            //     method: "put"
-                            // }).then(response => {
-                            //     console.log(formData2);
-                            //     response.json().then(e => {
-                            //         console.log(e);
-                            //     })
-                            // }).catch(err => {
-                            //     console.log(err);
-                            // });
-                        }
-                        fn_inputImage(
-                            document.getElementById("input-image2"),
-                            document.getElementById("preview-image2")
-                        );
-                    }
-                })
+                });
             };
         };
 
@@ -387,37 +441,33 @@
             };
             modalWrapDokumentasi = document.createElement("div");
             modalWrapDokumentasi.innerHTML = `
-                        <div class="modal modal-lg fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Dokumentasi</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div id="data">
-                                            <span>Loading...</span>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-info btn-back-dokumentasi btn-sm" style="width: 90px;" type="submit">
-                                                Back
-                                        </button>
-                                    </div>
+                <div class="modal modal-lg fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Dokumentasi</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="data">
+                                    <span>Loading...</span>
                                 </div>
                             </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-info btn-back-dokumentasi btn-sm" style="width: 90px;" type="submit">
+                                        Back
+                                </button>
+                            </div>
                         </div>
-                        `
+                    </div>
+                </div>
+            `
             document.body.append(modalWrapDokumentasi);
             let modal = new bootstrap.Modal(modalWrapDokumentasi.querySelector(".modal"));
             modal.show();
             showModalDokumentasi(data2);
         }
     });
-    // fn_inputImage(
-    //     document.getElementById("input-image"),
-    //     document.getElementById("preview-image")
-    // );
 </script>
 <script>
     new DataTable("#example");

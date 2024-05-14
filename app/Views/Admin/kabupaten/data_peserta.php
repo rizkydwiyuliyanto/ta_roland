@@ -94,92 +94,226 @@
             document.body.append(modalWrap);
             let modal = new bootstrap.Modal(modalWrap.querySelector(".modal"));
             modal.show();
-            var xmlhttp = new XMLHttpRequest;
-            xmlhttp.onreadystatechange = function() {
-                if (this.readyState === 4 && this.status === 200) {
-                    const a = JSON.parse(this.responseText);
-                    console.log(a)
-                    let page = {
-                        "detail": "",
-                        "edit": "",
-                        "hapus": "",
-                        "previousPage": ""
-                    }
-                    let previousPage = "";
-
-                    const setDetailPage = (a, page) => {
-                        const createColumn = (id, label) => {
-                            return {
-                                id: id,
-                                label: label
+            const openDetail = () => {
+                var xmlhttp = new XMLHttpRequest;
+                xmlhttp.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        const a = JSON.parse(this.responseText);
+                        console.log(a)
+                        let page = {
+                            "detail": "",
+                            "edit": "",
+                            "hapus": ""
+                        };
+                        const setDetailPage = (a, page) => {
+                            const createColumn = (id, label) => {
+                                return {
+                                    id: id,
+                                    label: label
+                                }
                             }
-                        }
-                        const columns = [
-                            createColumn("nik", "NIK"),
-                            createColumn("nama_pemilik", "Pemilik"),
-                            createColumn("alamat", "Alamat"),
-                            createColumn("no_hp", "No. HP"),
-                            createColumn("jumlah_ternak", "Jumlah ternak"),
-                            createColumn("tgl_vaksin", "Tanggal vaksin"),
-                            createColumn("jenis_vaksin", "Jenis vaksin")
-                        ];
-                        page.detail = `
-                            ${columns.map((prop, idx) => {
-                                return (
-                                    `
-                                        <div class="d-flex ${idx !== 0?"mt-2":""} justify-content-between">
-                                            <span style="color:#494E58;" class="col-6">
-                                                ${prop.label}
-                                            </span>
-                                            <span class="col-6">
-                                            :  ${a.data_peserta[prop.id]}
-                                            </span>
-                                        </div>
-                                    `
-                                )
-                            }).join("")}
-                            <div class="mt-4">
-                                <button class="btn btn-primary me-2 btn-sm" id="btn-edit">Edit peserta</button>
-                                <button class="btn btn-danger btn-sm" id="btn-hapus">Hapus peserta</button>
-                            </div>
-                        `
-                        console.log(previousPage)
-                        document.getElementById("data").innerHTML = page.detail;
-                        page.previousPage = page.detail;
-                    }
-                    setDetailPage(a, page);
-                    const setHapusPage = (a, page) => {
-                        if (page.hapus === "") {
-                            page.hapus = `
-                                <div class="d-flex align-items-center">
-                                    <span>Hapus peserta vaksin?</span>
-                                    <div class="d-flex ms-auto">
-                                        <button class="btn me-2 btn-danger btn-sm">Tidak</button>
-                                        <button class="btn btn-primary btn-sm" id="submit-hapus">Iya</button>
-                                    </div>
+                            const columns = [
+                                createColumn("nik", "NIK"),
+                                createColumn("nama_pemilik", "Pemilik"),
+                                createColumn("alamat", "Alamat"),
+                                createColumn("no_hp", "No. HP"),
+                                createColumn("jumlah_ternak", "Jumlah ternak"),
+                                createColumn("tgl_vaksin", "Tanggal vaksin"),
+                                createColumn("jenis_vaksin", "Jenis vaksin")
+                            ];
+                            page.detail = `
+                                ${columns.map((prop, idx) => {
+                                    return (
+                                        `
+                                            <div class="d-flex ${idx !== 0?"mt-2":""} justify-content-between">
+                                                <span style="color:#494E58;" class="col-6">
+                                                    ${prop.label}
+                                                </span>
+                                                <span class="col-6">
+                                                :  ${a.data_peserta[prop.id]}
+                                                </span>
+                                            </div>
+                                        `
+                                    )
+                                }).join("")}
+                                <div class="mt-4">
+                                    <button class="btn btn-primary me-2 btn-sm" id="btn-edit" data-id-jenis-vaksin="${a.data_peserta["id_jenis_vaksin"]}">Edit peserta</button>
+                                    <button class="btn btn-danger btn-sm" id="btn-hapus">Hapus peserta</button>
                                 </div>
-
                             `
-                        };
-                        document.getElementById("data").innerHTML = page.hapus;
-                        document.getElementById("submit-hapus").onclick = () => {
-                            window.location.href = "<?php echo base_url("admin_kab/delete_peserta/")?>"+idPeserta;
+                            document.getElementById("data").innerHTML = page.detail;
                         }
-                    };
-
-                    document.getElementById("btn-hapus").onclick = () => {
-                        setHapusPage(a, page)
-                    };
-                    document.getElementById("back").onclick = () => {
-                        document.getElementById("data").innerHTML = page.previousPage;
-                        document.getElementById("btn-hapus").onclick = () => {
-                            setHapusPage(a, page)
+                        setDetailPage(a, page);
+                        const setHapusPage = (page) => {
+                            if (page.hapus === "") {
+                                page.hapus = `
+                                    <div class="d-flex align-items-center">
+                                        <span>Hapus peserta vaksin?</span>
+                                        <div class="d-flex ms-auto">
+                                            <button class="btn me-2 btn-danger btn-sm">Tidak</button>
+                                            <button class="btn btn-primary btn-sm" id="submit-hapus">Iya</button>
+                                        </div>
+                                    </div>
+    
+                                `
+                            }
+                            document.getElementById("data").innerHTML = page.hapus;
+                            document.getElementById("submit-hapus").onclick = () => {
+                                window.location.href = "<?php echo base_url("admin_kab/delete_peserta/") ?>" + idPeserta;
+                            }
                         };
-                    };
+                        const setEditPages = (page, idJenisVaksin) => {
+                                var xmlhttp = new XMLHttpRequest;
+                                xmlhttp.onreadystatechange = function() {
+                                    if (this.readyState === 4 && this.status === 200) {
+                                        const a = JSON.parse(this.responseText);
+                                        console.log(a);
+                                        if (page.edit === "") {
+                                            page.edit = `
+                                                        <div class="mb-4">
+                                                            <label for="select-jenis-vaksin" class="form-label fw-bold" style="line-height: 0.75;color:#636363">Jenis vaksin *</label>
+                                                            <select class="form-select" id="select-jenis-vaksin">
+                                                                    ${a.jenis_vaksin.map(x => {
+                                                                        return (
+                                                                            `
+                                                                                <option
+                                                                                    value="${x["id"]}"
+                                                                                    ${idJenisVaksin === x["id"] ? "selected" : ""}
+                                                                                >
+                                                                                    ${x["jenis_vaksin"]}
+                                                                                </option>
+                                                                            `
+                                                                        )
+                                                                    })}
+                                                                </select>
+                                                        </div>
+                                                        <form id="form-edit">
+                                                            <div class="mb-4 mt-2">
+                                                                <label for="jadwal" class="form-label fw-bold" style="line-height: 0.75;color:#636363">Jadwal vaksin *</label>
+                                                                <select class="form-select" name="jadwal" id="jadwal">
+                                                                        ${a.jadwal_vaksin.filter(x => {
+                                                                            return x["id_jenis_vaksin"] === idJenisVaksin
+                                                                        }).map(y => {
+                                                                            return (
+                                                                                `
+                                                                                    <option
+                                                                                        value="${y["id_jadwal"]}"
+                                                                                        ${a.data_peserta["id_jadwal"] === y["id_jadwal"] ? "selected" : ""}
+                                                                                    >
+                                                                                        ${y["tgl_vaksin"]}
+                                                                                    </option>  
+                                                                                `
+                                                                            )
+                                                                        }).join("")}
+                                                                    </select>
+                                                            </div>
+                                                            <div>
+                                                                <label for="peternak" class="form-label fw-bold" style="line-height: 0.75;color:#636363">Pemilik ternak *</label>
+                                                                    <select class="form-select" name="peternak" id="peternak">
+                                                                        ${a.data_peternak.map(x => {
+                                                                            return (
+                                                                                `
+                                                                                    <option
+                                                                                        value="${x["nik"]}"
+                                                                                        ${a.data_peserta["nik"] === x["nik"] ? "selected" : ""}
+                                                                                    >
+                                                                                        ${x["nama_pemilik"]} | ${x["no_hp"]}
+                                                                                    </option>
+                                                                                `
+                                                                            )
+                                                                        })}
+                                                                    </select>
+                                                            </div>
+                                                        </form>
+                                                        <button type="button" id="btn-submit-edit" class="btn mt-2 btn-primary btn-sm">Submit</button>
+                                            `
+                                        }
+                                        document.getElementById("data").innerHTML = page.edit;
+                                        let x = [];
+                                        const changeJadwal = (arr, idJenisVaksin) => {
+                                            x = arr.filter(x => {
+                                                return x["id_jenis_vaksin"] === idJenisVaksin
+                                            });
+                                            return x;
+                                        }                                            
+                                        const checkEmpty = () => {
+                                            const formLength = formEdit.elements.length;
+                                            const isEmptyExist = Object.keys(formEdit.elements).find(prop => {
+                                                return formEdit.elements[prop].value === ""
+                                            });
+                                            document.getElementById("btn-submit-edit").removeAttribute("disabled");
+                                            if (isEmptyExist || x.length === 0) document.getElementById("btn-submit-edit").setAttribute("disabled", true);
+                                        }
+                                        const formEdit = document.getElementById("form-edit");
+                                        document.getElementById("btn-submit-edit").onclick = () => {
+                                            const formData = new FormData(formEdit);
+                                            fetch("<?php echo base_url("admin_kab/edit_peserta/")?>"+idPeserta,{
+                                                method:"post",
+                                                body:formData
+                                            }).then(response => {
+                                                response.json().then(e => {
+                                                    if(e.success) {
+                                                        openDetail();
+                                                    }
+                                                })
+                                            })
+                                        };
+    
+                                        document.getElementById("select-jenis-vaksin").onchange = (e) => {
+                                            const idJenisVaksin = e.target.value;
+                                            // document.getElementById("")
+                                            const jadwal =changeJadwal(a.jadwal_vaksin,idJenisVaksin);
+                                            document.getElementById("jadwal").innerHTML = `
+                                                ${jadwal.map((y, idx) => {
+                                                        return (
+                                                            `
+                                                                <option
+                                                                    value="${y["id_jadwal"]}"
+                                                                    ${idx === 0 ? "selected" : ""}
+                                                                >
+                                                                    ${y["tgl_vaksin"]}
+                                                                </option>  
+                                                            `
+                                                        )
+                                                }).join("")}
+                                            `
+                                            checkEmpty();
+                                        }
+                                        document.getElementById("jadwal").onchange = () => {
+                                            checkEmpty();
+                                        }
+                                        document.getElementById("peternak").onchange = () => {
+                                            checkEmpty();
+                                        }
+                                    }
+                                }
+                                xmlhttp.open("get", "<?php echo base_url("admin_kab/detail_peserta_edit") ?>" + "?id_vaksin=" + a.data_peserta["id_jenis_vaksin"] + "&id_peserta=" + idPeserta);
+                                xmlhttp.send()
+                            
+                        }
+                        document.getElementById("btn-hapus").onclick = () => {
+                            setHapusPage(page)
+                        };
+                        document.getElementById("btn-edit").onclick = (e) => {
+                            const idJenisVaksin = document.getElementById("btn-edit").getAttribute("data-id-jenis-vaksin");
+                            setEditPages(page, idJenisVaksin);
+                        };
+                        document.getElementById("back").onclick = () => {
+                            document.getElementById("data").innerHTML = page.detail;
+                            document.getElementById("btn-hapus").onclick = () => {
+                                setHapusPage(page)
+                            };
+                            document.getElementById("btn-edit").onclick = (e) => {
+                                const idJenisVaksin = document.getElementById("btn-edit").getAttribute("data-id-jenis-vaksin");
+                                setEditPages(page, idJenisVaksin);
+                            };
+                        };
+                    }
                 }
+                xmlhttp.open("get", "<?php echo base_url("admin_kab/detail_peserta/") ?>" + idPeserta);
+                xmlhttp.send();
             }
-            xmlhttp.open("get", "<?php echo base_url("admin_kab/detail_peserta/") ?>" + idPeserta);
-            xmlhttp.send();
+            openDetail();
         }
     })
 </script>

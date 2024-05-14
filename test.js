@@ -1,9 +1,4 @@
-let test = {
-    "one": ""
+for (let i = 0; i <= 10;) {
+    
+    console.log(i)
 }
-const setNumber = (a) => {
-    a.one = "20"
-}
-
-setNumber(test);
-console.log(test)

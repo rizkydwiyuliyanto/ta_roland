@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
 :root {
   --sidebarBG: #e7e7e7;
   --headerBG: #343148;
@@ -15,6 +16,123 @@
 
 body {
   background-color: #EAEFF2;
+}
+
+.navbar {
+  height: 50px;
+  background-color: var(--headerBG);
+}
+.navbar h4 {
+  margin: 0;
+  color: #F1F1F1;
+}
+.navbar a {
+  text-decoration: none;
+  color: #F1F1F1;
+}
+
+.banner {
+  height: calc(100vh - 50px);
+  width: 100%;
+  background-image: url("./../image/landingpage/bg-banner1.jpg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.banner .banner-content {
+  display: flex;
+  height: 80%;
+  align-items: center;
+}
+.banner #contact {
+  margin-left: auto;
+}
+.banner #contact .header-form h4 {
+  text-align: center;
+}
+.banner #contact #form {
+  width: 520px;
+  float: left;
+  border-radius: 7px;
+  color: #F1F1F1;
+  background-color: var(--headerBG);
+  padding: 1.7em 2.2em;
+}
+.banner #contact #form .form-items {
+  display: flex;
+  justify-content: space-between;
+}
+.banner #contact #form .form-items input {
+  font-family: "Open Sans";
+  float: left;
+  width: 320px;
+  border: 0px;
+  color: #222222;
+  padding: 10px 10px 10px 30px;
+  margin-bottom: 10px;
+  background-color: #F1F1F1;
+}
+.banner #contact #form .form-items textarea {
+  float: left;
+  border: 0px;
+  width: 320px;
+  height: 140px;
+  padding: 10px 10px 10px 30px;
+  color: #222222;
+  background-color: #F1F1F1;
+  resize: none;
+}
+.banner #contact #form .form-items span {
+  font-family: "Open Sans";
+}
+.banner #contact #form button.submit {
+  cursor: pointer;
+  width: 320px;
+  height: 37px;
+  background: none;
+  outline: none;
+  border: none;
+  margin-left: auto;
+  margin-top: 12px;
+  font-weight: bold;
+  font-family: "Open Sans";
+  font-size: 18px;
+  background-color: #ECDB54;
+  color: #222222;
+}
+
+.distribusi-item {
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 12px;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+.distribusi-item::before {
+  content: "";
+  height: 2px;
+  background-color: var(--headerBG);
+  position: absolute;
+  bottom: -2px;
+  width: 0;
+  transition: width 0.2s 0s linear;
+}
+.distribusi-item:hover::before {
+  width: 100%;
+}
+.distribusi-item:last-child {
+  margin-bottom: 0;
+}
+
+.grid-parent-dokumentasi-detail {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  row-gap: 14px;
+  -moz-column-gap: 18px;
+       column-gap: 18px;
 }
 
 .grid-parent {
@@ -237,4 +355,83 @@ body {
   margin-top: 50px;
   height: 80px;
   padding: 1em 0;
+}
+.content-parent .search {
+  position: relative;
+  box-shadow: 0 0 40px rgba(51, 51, 51, 0.1);
+}
+.content-parent .search input {
+  height: 60px;
+  text-indent: 25px;
+  border: 2px solid #d6d4d4;
+}
+.content-parent .search input:focus {
+  box-shadow: none;
+  border: 2px solid blue;
+}
+.content-parent .search .fa-search {
+  position: absolute;
+  top: 20px;
+  left: 16px;
+}
+.content-parent .search button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  height: 50px;
+  width: 110px;
+  background: blue;
+}
+
+#example {
+  font-size: 15px;
+}
+
+.dokumentasi-item {
+  opacity: 1;
+  transition: opacity 0.36s 0s ease-out;
+}
+
+.card-radio {
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+.card-radio .radio-label {
+  display: flex;
+  flex-direction: column;
+}
+.card-radio .box {
+  background: #ddd;
+  padding: 16px;
+  display: flex;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.card-radio .box:hover {
+  background: #d5bbf7;
+}
+.card-radio .box .circle {
+  height: 16px;
+  width: 16px;
+  background: #ccc;
+  border: 3.4px solid transparent;
+  display: inline-block;
+  margin-right: 9px;
+  border-radius: 50%;
+  transition: all 0.25s ease;
+  box-shadow: inset -4px -4px 10px rgba(0, 0, 0, 0.2);
+}
+.card-radio .box .plan {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  font-size: 17px;
+}
+.card-radio .box .price {
+  font-size: 14px;
 }/*# sourceMappingURL=style.css.map */

@@ -9,6 +9,6 @@ class PeternakModel extends Model
     protected $table = 'pemilik_ternak';
     protected $primaryKey = "nik";
     protected $allowedFields = [
-        'nik', 'id_kab', "nama_pemilik", "no_hp", "alamat"
+        'nik', "id_usulan",'id_kab', "nama_pemilik", "no_hp", "alamat"
     ];
 }
